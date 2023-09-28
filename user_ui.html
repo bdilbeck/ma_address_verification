@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Address Lookup</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+  
+</head>
+<body>
+<h1>Address Verification</h1>
+<form id="addressForm">
+<li><label for="AddressLine1">Address Line 1:</label></li>
+<li><input type="text" name="addressLine1" id="addressLine1" size="60" /></li>
+<li><input type="submit" value="Submit"></li>
+</form>
+<li><label for="AddressLine2">Address Line 2:</label></li>
+<li><input type="text" name="AddressLine2" id="addressLine2" size="60" /></li>
+<li><label for="city">City:</label></li>
+<li><input type="text" name="city" id="city" size="20" /></li>
+<li><label for="country">Country:</label></li>
+<li><select name="country">
+<option selected="" value="Default">(Please select a country)</option>
+<option value="US">USA</option>
+<option value="CA">Canada</option>
+</select></li>
+<li><label for="stateorprovince">State/Province:</label></li>
+<li><select name="stateorprovince" id="stateorprovince">
+    <option selected="" value="Default">(Please select a state)</option>
+    <option value="AL">Alabama (AL)</option>
+	<option value="AK">Alaska (AK)</option>
+	<option value="AZ">Arizona (AZ)</option>
+	<option value="AR">Arkansas (AR)</option>
+	<option value="CA">California (CA)</option>
+	<option value="CO">Colorado (CO)</option>
+	<option value="CT">Connecticut (CT)</option>
+	<option value="DE">Delaware (DE)</option>
+	<option value="DC">District Of Columbia (DC)</option>
+	<option value="FL">Florida (FL)</option>
+	<option value="GA">Georgia (GA)</option>
+	<option value="HI">Hawaii (HI)</option>
+	<option value="ID">Idaho (ID)</option>
+	<option value="IL">Illinois (IL)</option>
+	<option value="IN">Indiana (IN)</option>
+	<option value="IA">Iowa (IA)</option>
+	<option value="KS">Kansas (KS)</option>
+	<option value="KY">Kentucky (KY)</option>
+	<option value="LA">Louisiana (LA)</option>
+	<option value="ME">Maine (ME)</option>
+	<option value="MD">Maryland (MD)</option>
+	<option value="MA">Massachusetts (MA)</option>
+	<option value="MI">Michigan (MI)</option>
+	<option value="MN">Minnesota (MN)</option>
+	<option value="MS">Mississippi (MS)</option>
+	<option value="MO">Missouri (MO)</option>
+	<option value="MT">Montana (MT)</option>
+	<option value="NE">Nebraska (NE)</option>
+	<option value="NV">Nevada (NV)</option>
+	<option value="NH">New Hampshire (NH)</option>
+	<option value="NJ">New Jersey (NJ)</option>
+	<option value="NM">New Mexico (NM)</option>
+	<option value="NY">New York (NY)</option>
+	<option value="NC">North Carolina (NC)</option>
+	<option value="ND">North Dakota (ND)</option>
+	<option value="OH">Ohio (OH)</option>
+	<option value="OK">Oklahoma (OK)</option>
+	<option value="OR">Oregon (OR)</option>
+	<option value="PA">Pennsylvania (PA)</option>
+	<option value="RI">Rhode Island (RI)</option>
+	<option value="SC">South Carolina (SC)</option>
+	<option value="SD">South Dakota (SD)</option>
+	<option value="TN">Tennessee (TN)</option>
+	<option value="TX">Texas (TX)</option>
+	<option value="UT">Utah (UT)</option>
+	<option value="VT">Vermont (VT)</option>
+	<option value="VA">Virginia (VA)</option>
+	<option value="WA">Washington (WA)</option>
+	<option value="DC">Washington DC (DC)</option>
+	<option value="WV">West Virginia (WV)</option>
+	<option value="WI">Wisconsin (WI)</option>
+	<option value="WY">Wyoming (WY)</option>
+    </select></li>
+
+<li><label for="zip">ZIP Code:</label></li>
+<li><input type="text" name="zip" id="zip" size="5" /></li>
+<li><label for="zip +4">ZIP Code +4:</label></li>
+<li><input type="text" name="zip +4" size="4" /></li>
+</select></li>
+<div id="validationResult"></div>
+<script>
+
+	// Makes the script wait for HTML before executing
+document.addEventListener("DOMContentLoaded", function () {
+  console.log('JavaScript code is executing'); // Debugging tool, indicates in console log that the JS is active
+
+  // Adds the event listener to the webpage. The event listener waits for the submit button to be pressed, executing once it is.
+  document.getElementById('addressForm').addEventListener('submit', function (e) {
+      e.preventDefault(); // Prevents the default submission behavior so JS can take the data, send request to server, and return a response
+      console.log('Submit button event listener is called.'); //Another debug tool to confirm the event listener is operational
+      
+	  const address = document.getElementById('addressLine1').value; // Obtains the user-entered value of 'addressLine1'
+  
+	  // Sends the POST API request to the endpoint, '/submitAddress'
+      fetch('/submitAddress', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ addressLine1: address }), // Converts the JS object into a JSON string.
+      })
+      .then(response => response.json()) //Converts JSON response into a JS object
+	  .then(data => {
+		console.log('Server Response:', data);
+		const validationResultElement = document.getElementById('validationResult'); // finds the html element with the id 'validationResult'
+	  
+		if (data.validAddress === true) {
+		  // Instructions if the result is positive.
+		  validationResultElement.textContent = 'Matching address found.';
+		  validationResultElement.style.color = 'green';
+		  console.log('Address is valid');
+		  console.log('Matching addresses:', data.matchingAddresses);
+		} else {
+		  // Instructions if the result is negative.
+		  validationResultElement.textContent = 'Matching address not found.';
+		  validationResultElement.style.color = 'red';
+		  console.error('Address is not valid');
+		}
+	  })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  });
+});
+      </script>
+</body>
+</html>
