@@ -25,9 +25,20 @@ def submit_address():
         # Obtains JSON data from request
         data = request.get_json()
         # Validate and process the data
-        entered_address = data.get('addressLine1') # Gets the selected data out of the JSON data
+        entered_addresslineone = data.get('addressLine1') # Gets the selected data out of the JSON data
+        entered_city = data.get('city')
+        entered_state = data.get('stateorprovince') # Gets the selected data out of the JSON data
+        entered_country = data.get('country')
+        entered_zip = data.get('zip') # Gets the selected data out of the JSON data
+        entered_zipplusfour = data.get('zip +4')       
         # Query the MongoDB database looking for a match to addressLine1
-        found_match = collection.find_one({'addressLine1' : entered_address})
+        found_match = collection.find_one({'addressLine1' : entered_addresslineone,
+                                        'city' : entered_city,
+                                        'stateorprovince' : entered_state,
+                                        'country' : entered_country,
+                                        'zip' : entered_zip,
+                                        'zipplusfour' : entered_zipplusfour,   
+                                            })
 
         
         # Determines if a matching address was found
@@ -41,4 +52,4 @@ def submit_address():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run()
