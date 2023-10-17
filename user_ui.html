@@ -135,13 +135,20 @@ document.addEventListener("DOMContentLoaded", function () {
 		console.log('Server Response:', data);
 		const validationResultElement = document.getElementById('validationResult'); // finds the html element with the id 'validationResult'
 	  
-		if (data.validAddress === true) {
+		if (data.validAddress === true && data.matchType === true) {
 		  // Instructions if the result is positive.
 		  validationResultElement.textContent = 'Matching address found.';
 		  validationResultElement.style.color = 'green';
 		  console.log('Address is valid');
 		  console.log('Matching addresses:', data.matchingAddresses);
-		} else {
+		} 
+    else if (data.validAddress === true && data.matchType === false){
+      validationResultElement.textContent = "Partial match found";
+      validationResultElement.style.color = 'yellow';
+      console.log('Address is valid but partially incorrect.');
+		  console.log('Matching addresses:', data.matchingAddresses);
+    }
+    else {
 		  // Instructions if the result is negative.
 		  validationResultElement.textContent = 'Matching address not found.';
 		  validationResultElement.style.color = 'red';
