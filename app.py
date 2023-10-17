@@ -32,20 +32,41 @@ def submit_address():
         entered_zip = data.get('zip') # Gets the selected data out of the JSON data
         entered_zipplusfour = data.get('zip +4')       
         # Query the MongoDB database looking for a match to addressLine1
-        found_match = collection.find_one({'addressLine1' : entered_addresslineone,
+        found_match = collection.find_one({
+             '$or' :[
+            
+           { 'addressLine1' : entered_addresslineone,
                                         'city' : entered_city,
                                         'stateorprovince' : entered_state,
-                                        'country' : entered_country,
+                                           'country' : entered_country,
+                                        },
+                                                                                 
+                                   
+                                  {
                                         'zip' : entered_zip,
-                                        'zipplusfour' : entered_zipplusfour,   
-                                            })
+                                       'zipplusfour' : entered_zipplusfour,}
+]
+   })
 
-        
-        # Determines if a matching address was found
+        if found_match.get('zip') == entered_zip:
+            zip_match = True
+
         valid_address = found_match is not None
-        
+
+        address_match = found_match.get('addressLine1') == entered_addresslineone and found_match.get('city') == entered_city and found_match.get('stateorprovince') == entered_state and found_match.get('country') == entered_country
+
+        zip_match = found_match.get('zip') == entered_zip
+
+        perfect_match = address_match and zip_match
+
+
+
+
+
+
+                                                        
         # Creates a response
-        response = {'validAddress': valid_address, 'message': 'Address is valid.' if valid_address else 'Address is not valid.'} 
+        response = {'validAddress': valid_address,'matchType':perfect_match, 'message': 'Address is valid; match found.' if valid_address else 'Address is not valid.'} 
         return jsonify(response), 200
     except Exception as error: # Handles server errors
         return jsonify({f'error': 'Internal server error: {error}'}), 500
