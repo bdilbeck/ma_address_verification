@@ -3,19 +3,17 @@
 <head>
     <title>Address Lookup</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
-  
+
 </head>
 <body>
 <h1>Address Verification</h1>
 <form id="addressForm">
 <li><label for="AddressLine1">Address Line 1:</label></li>
 <li><input type="text" name="addressLine1" id="addressLine1" size="60" /></li>
+<li><label for="addressLine2">Address Line 2: </label></li>
+<li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
 <li><label for="city">City:</label></li>
 <li><input type="text" name="city" id="city" size="20" /></li>
-
-<!--<li><label for="AddressLine2">Address Line 2:</label></li>
-<li><input type="text" name="AddressLine2" id="addressLine2" size="60" /></li>
--->
 
 <li><label for="country">Country:</label></li>
 <li><select name="country" id="country">
@@ -86,10 +84,10 @@
 <li><label for="zip">ZIP Code:</label></li>
 <li><input type="text" name="zip" id="zip" size="5" /></li>
 
-<!--<li><label for="zip +4">ZIP Code +4:</label></li>
-<li><input type="text" name="zip +4" size="4" /></li>
+<li><label for="zip +4">ZIP Code +4:</label></li>
+<li><input type="text" name="zip +4" size="4" id="zipPlusFour"/></li>
 </select></li>
--->
+
 <li><input type="submit" value="Submit"></li>
 </form>
 <div id="validationResult"></div>
@@ -105,20 +103,22 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log('Submit button event listener is called.'); //Another debug tool to confirm the event listener is operational
       
 	  const addressLine1 = document.getElementById('addressLine1').value; // Obtains the user-entered value of 'addressLine1'
+    const addressLine2 = document.getElementById('addressLine2').value; 
 	  const city = document.getElementById('city').value;
 	  const stateorprovince = document.getElementById('stateorprovince').value;
 	  const country = document.getElementById('country').value;
 	  const zip = document.getElementById('zip').value;
-	  //const zipplusfour = document.getElementById('zip +4').value;
+	  const zipPlusFour = document.getElementById('zipPlusFour').value;    
 	  
 
 	  const fullAddress ={
         addressLine1: addressLine1,
+        ...(addressLine2 && { addressLine2: addressLine2 }),
         city: city,		
 		stateorprovince: stateorprovince,
 		country: country,
 		zip: zip,
-		//zipplusfour:zipplusfour
+    ...(zipPlusFour && { zipPlusFour: zipPlusFour })
 
 	  };
   
@@ -134,26 +134,35 @@ document.addEventListener("DOMContentLoaded", function () {
 	  .then(data => {
 		console.log('Server Response:', data);
 		const validationResultElement = document.getElementById('validationResult'); // finds the html element with the id 'validationResult'
-	  
-		if (data.validAddress === true && data.matchType === true) {
+
+	    matchingAddresses = data.found_match
+
+		if (data.validAddress === true && data.perfectMatch === true) {
 		  // Instructions if the result is positive.
-		  validationResultElement.textContent = 'Matching address found.';
+		  validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
 		  validationResultElement.style.color = 'green';
-		  console.log('Address is valid');
+		  console.log('Address is valid and includes all optional elements.');
 		  console.log('Matching addresses:', data.matchingAddresses);
 		} 
-    else if (data.validAddress === true && data.matchType === false){
-      validationResultElement.textContent = "Partial match found";
-      validationResultElement.style.color = 'yellow';
-      console.log('Address is valid but partially incorrect.');
-		  console.log('Matching addresses:', data.matchingAddresses);
+        
+        else if (data.validAddress== true && data.nearMatch === true){
+        validationResultElement.textContent = "Near match found.";
+        validationResultElement.style.color = 'lightgreen';
+        console.log('Address is valid but is missing optional elements.');
     }
-    else {
-		  // Instructions if the result is negative.
-		  validationResultElement.textContent = 'Matching address not found.';
-		  validationResultElement.style.color = 'red';
-		  console.error('Address is not valid');
-		}
+
+        else if (data.validAddress === true && data.partialMatch === true){
+        validationResultElement.textContent = 'Partial match found. Did you mean';
+        validationResultElement.style.color = 'yellow';
+        console.log('Address is valid but is partially incorrect.');
+        console.log('Matching addresses:', data.matchingAddresses);
+        }
+        else {
+            // Instructions if the result is negative.
+            validationResultElement.textContent = 'Matching address not found.';
+            validationResultElement.style.color = 'red';
+            console.log('Address is not valid');
+            }
 	  })
       .catch(error => {
           console.error('Error:', error);
