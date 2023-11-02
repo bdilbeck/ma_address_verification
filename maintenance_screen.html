@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maintenance Page</title>
+
+
+</head>
+<body>
+    <h1>Maintenance Page</h1>
+    <h4>Use this page to add, edit, and delete records in the database.</h4>
+
+
+<h1>Address Verification</h1>
+<button id="openPopup">Add New Address</button>
+<div id="popup" style="display: none;">
+<form id="popupForm" action="/new_entry" method="post"><li><label for="AddressLine1">Address Line 1:</label></li>
+<li><input type="text" name="addressLine1" id="addressLine1" size="60" /></li>
+<li><label for="addressLine2">Address Line 2: </label></li>
+<li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
+<li><label for="city">City:</label></li>
+<li><input type="text" name="city" id="city" size="20" /></li>
+
+<li><label for="country">Country:</label></li>
+<li><select name="country" id="country">
+<option selected="" value="Default">(Please select a country)</option>
+<option value="US" id="US">USA</option>
+<option value="CA" id="CA">Canada</option>
+</select></li>
+
+<li><label for="stateorprovince">State/Province:</label></li>
+<li>
+    <select name="stateorprovince" id="stateorprovince">
+        <option selected="" value="Default">(Please select a state)</option>
+        <option value="AL" id="AL">Alabama (AL)</option>
+        <option value="AK" id="AK">Alaska (AK)</option>
+        <option value="AZ" id="AZ">Arizona (AZ)</option>
+        <option value="AR" id="AR">Arkansas (AR)</option>
+        <option value="CA" id="CA">California (CA)</option>
+        <option value="CO" id="CO">Colorado (CO)</option>
+        <option value="CT" id="CT">Connecticut (CT)</option>
+        <option value="DE" id="DE">Delaware (DE)</option>
+        <option value="DC" id="DC">District Of Columbia (DC)</option>
+        <option value="FL" id="FL">Florida (FL)</option>
+        <option value="GA" id="GA">Georgia (GA)</option>
+        <option value="HI" id="HI">Hawaii (HI)</option>
+        <option value="ID" id="ID">Idaho (ID)</option>
+        <option value="IL" id="IL">Illinois (IL)</option>
+        <option value="IN" id="IN">Indiana (IN)</option>
+        <option value="IA" id="IA">Iowa (IA)</option>
+        <option value="KS" id="KS">Kansas (KS)</option>
+        <option value="KY" id="KY">Kentucky (KY)</option>
+        <option value="LA" id="LA">Louisiana (LA)</option>
+        <option value="ME" id="ME">Maine (ME)</option>
+        <option value="MD" id="MD">Maryland (MD)</option>
+        <option value="MA" id="MA">Massachusetts (MA)</option>
+        <option value="MI" id="MI">Michigan (MI)</option>
+        <option value="MN" id="MN">Minnesota (MN)</option>
+        <option value="MS" id="MS">Mississippi (MS)</option>
+        <option value="MO" id="MO">Missouri (MO)</option>
+        <option value="MT" id="MT">Montana (MT)</option>
+        <option value="NE" id="NE">Nebraska (NE)</option>
+        <option value="NV" id="NV">Nevada (NV)</option>
+        <option value="NH" id="NH">New Hampshire (NH)</option>
+        <option value="NJ" id="NJ">New Jersey (NJ)</option>
+        <option value="NM" id="NM">New Mexico (NM)</option>
+        <option value="NY" id="NY">New York (NY)</option>
+        <option value="NC" id="NC">North Carolina (NC)</option>
+        <option value="ND" id="ND">North Dakota (ND)</option>
+        <option value="OH" id="OH">Ohio (OH)</option>
+        <option value="OK" id="OK">Oklahoma (OK)</option>
+        <option value="OR" id="OR">Oregon (OR)</option>
+        <option value="PA" id="PA">Pennsylvania (PA)</option>
+        <option value="RI" id="RI">Rhode Island (RI)</option>
+        <option value="SC" id="SC">South Carolina (SC)</option>
+        <option value="SD" id="SD">South Dakota (SD)</option>
+        <option value="TN" id="TN">Tennessee (TN)</option>
+        <option value="TX" id="TX">Texas (TX)</option>
+        <option value="UT" id="UT">Utah (UT)</option>
+        <option value="VT" id="VT">Vermont (VT)</option>
+        <option value="VA" id="VA">Virginia (VA)</option>
+        <option value="WA" id="WA">Washington (WA)</option>
+        <option value="DC" id="DC">Washington DC (DC)</option>
+        <option value="WV" id="WV">West Virginia (WV)</option>
+        <option value="WI" id="WI">Wisconsin (WI)</option>
+        <option value="WY" id="WY">Wyoming (WY)</option>
+    </select>
+</li>
+
+<li><label for="zip">ZIP Code:</label></li>
+<li><input type="text" name="zip" id="zip" size="5" /></li>
+
+<li><label for="zip +4">ZIP Code +4:</label></li>
+<li><input type="text" name="zip +4" size="4" id="zipPlusFour"/></li>
+
+<li><input type="submit" value="Submit"></li>
+</form>
+</div>
+<button>Button1</button>
+
+<h1>Entry Lookup</h1>
+<h1>Entry List</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Address Line 1</th>
+            <th>Action</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry._id }}</td>
+            <td>{{ entry.addressLine1 }}</td>
+            <td>
+                <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button>
+                <button class="delete-entry-button" data-entry-id="{{ entry._id }}">Delete</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+    <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;">
+    <input type="hidden" name="entry_id" id="edit-entry-id">
+    <label for="edit-addressLine1">Address Line 1:</label>
+    <input type="text" name="addressLine1" id="edit-addressLine1">
+    <!-- Add other input fields for editing other properties -->
+    <input type="submit" value="Save Changes">
+    </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetchEntries(); // Fetch entries when the page loads
+    addEditButtonsClickListener(); // Add click event listener to edit buttons
+    addOpenPopupClickListener(); // Add click event listener to open popup button
+    addDeleteButtonsClickListener(); 
+});
+function fetchEntries() {
+    console.log('Fetching entries...');
+
+    fetch('/entries-json')
+        .then((response) => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`Fetch failed with status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            console.log('Data received from the server:', data);
+
+            const entries = data.entries;
+            const tbody = document.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            entries.forEach((entry) => {
+                const row = document.createElement('tr');
+                const idCell = document.createElement('td');
+                idCell.textContent = entry._id;
+                const addressLine1Cell = document.createElement('td');
+                addressLine1Cell.textContent = entry.addressLine1;
+                const actionCell = document.createElement('td');
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-entry-button';
+                editButton.textContent = 'Edit';
+                editButton.dataset.entryId = entry._id;
+
+                // Attach an event listener to the "Edit" button
+                editButton.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent the link from navigating
+
+                    const entryId = entry._id;
+                    getEntryById(entryId)
+                        .then((entry) => {
+                            if (entry) {
+                                // Populate the edit form with the entry data and show it
+                                populateEditForm(entry);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error fetching entry by ID:', error);
+                        });
+                });
+
+                row.appendChild(idCell);
+                row.appendChild(addressLine1Cell);
+                row.appendChild(actionCell);
+                actionCell.appendChild(editButton);
+
+                tbody.appendChild(row);
+            });
+        })
+        .catch((error) => {
+            console.error('Error fetching entries:', error);
+        });
+}
+
+function addEditButtonsClickListener() {
+    // Add a click event listener to all elements with the class "edit-entry-button"
+    document.querySelectorAll('.edit-entry-button').forEach((editButton) => {
+        editButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent the link from navigating
+
+            const entryId = editButton.dataset.entryId;
+            const entry = getEntryById(entryId); // Implement a function to get the entry data
+
+            if (entry) {
+                // Populate the edit form with the entry data and show it
+                populateEditForm(entry);
+            }
+        });
+    });
+}
+
+function addOpenPopupClickListener() {
+    const openButton = document.getElementById('openPopup');
+    const popup = document.getElementById('popup');
+
+    openButton.addEventListener('click', () => {
+        popup.style.display = 'block'; // Show the pop-up
+    });
+
+    const popupForm = document.getElementById('popupForm');
+    popupForm.addEventListener('submit', () => {
+        popup.style.display = 'none'; // Hide the pop-up after submission
+    });
+}
+
+
+function getEntryById(entryId) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(`/entry/${entryId}`);
+            if (!response.ok) {
+                throw new Error(`Fetch failed with status: ${response.status}`);
+            }
+            const entry = await response.json();
+            resolve(entry);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+
+const editForm = document.getElementById('edit-form');
+
+editForm.addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    try {
+        const formData = new FormData(editForm); // Get the form data
+        const response = await fetch(editForm.action, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            // Handle the success case
+            console.log('Form submitted successfully');
+        } else {
+            // Handle errors, such as displaying an error message
+            console.error('Form submission failed with status:', response.status);
+        }
+    } catch (error) {
+        // Handle network or other errors
+        console.error('Error during form submission:', error);
+    }
+});
+
+
+
+function populateEditForm(entry) {
+    console.log('Populating edit form:', entry);
+    // Implement a function to populate the edit form with entry data
+    // Set the input fields with the entry's values for editing
+    // Show the edit form
+
+    // Example code to populate form fields (adjust based on your HTML structure)
+    document.getElementById('edit-entry-id').value = entry._id;
+    document.getElementById('edit-addressLine1').value = entry.addressLine1;
+
+    const editForm = document.getElementById('edit-form');
+    editForm.action = `/edit_entry/${entry._id}`;
+
+    document.getElementById('edit-form').style.display = 'block'; // Show the edit form
+    console.log('Edit form populated:', entry);
+}
+
+
+function addDeleteButtonsClickListener() {
+    console.log('Delete Buttons Click Listener');
+    document.querySelectorAll('.delete-entry-button').forEach((deleteButton) => {
+        deleteButton.addEventListener('click', (event) => {
+            console.log('Delete Buttons Click Listener Event');
+            event.preventDefault(); // Prevent the link from navigating
+
+            const entryId = deleteButton.dataset.entryId;
+            const entry = getEntryById(entryId); // Implement a function to get the entry data
+
+            if (entry) {
+                console.log('Delete Buttons Click Listener: Deleting Entry');
+                deleteEntry(entryId);
+            }
+        });
+    });
+}
+
+
+
+function deleteEntry(entryId) {
+    fetch(`/delete_entry/${entryId}`, {
+    
+        method: 'POST',
+    })
+    .then((response) => {
+        console.log('Delete Entry response');
+        if (response.ok) {
+            // Handle the success case, e.g., by updating the UI
+            fetchEntries(); // Refresh the entry list
+        } else {
+            // Handle errors, e.g., by displaying an error message
+            console.error('Entry deletion failed with status:', response.status);
+        }
+    })
+    .catch((error) => {
+        // Handle network or other errors
+        console.error('Error during entry deletion:', error);
+    });
+}
+
+</script>
+
+
+
+</body>
+
+</html>
