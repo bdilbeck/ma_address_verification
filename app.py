@@ -1,10 +1,7 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 from pymongo import MongoClient
 from fuzzywuzzy import fuzz, process
 from bson.objectid import ObjectId
-
-
-
 
 app = Flask(__name__)
 
@@ -24,45 +21,93 @@ collection = db['ma_avs_addresses'] # Specifies the collection
 def run_ui():
     return render_template('user_ui.html')
 
-@app.route('/submitAddress', methods=['POST']) # Defines the root that handles POST requests to the endpoint, which is defined as '/submitAddress'
+#@app.route('/submitAddress', methods=['POST']) # Defines the root that handles POST requests to the endpoint, which is defined as '/submitAddress'
 
-@app.route('/maintainance_screen')
+@app.route('/entries')
+def entry_list():
+    # Retrieve a list of entries from the database
+    entries = collection.find()
+    return render_template('maintenance_screen.html', entries=entries)
+
+@app.route('/entries-json')
+def entry_list_json():
+    try:
+        entries = collection.find()
+
+        # Convert entries to a list of dictionaries and convert ObjectId to string
+        entry_list = [
+            {**entry, '_id': str(entry['_id'])}  # Convert ObjectId to string
+            for entry in entries
+        ]
+
+        return jsonify({'entries': entry_list})
+    except Exception as e:
+        print(f"Error in entry_list_json: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+@app.route('/maintenance_screen')
 def database_management():
     # Logic to retrieve and display database entries
-    return render_template('maintainance_screen.html')
+    return render_template('maintenance_screen.html')
 
-@app.route('/create_entry', methods=['POST'])
-def create_entry():
-    # Route that allows users to create new entries in the database
-    data = request.form
-    collection.insert_one(data)
-    return redirect(url_for('maintainance_screen'))  # Redirect back to the management page
+@app.route('/new_entry', methods=['GET','POST'])
+def new_entry():
+    if request.method == 'POST':
+        try:
+            data = dict(request.form)
+            collection.insert_one(data)
+            return redirect(url_for('database_management'))
+        except Exception as error:
+            return jsonify({'error': f'Internal server error: {error}'}), 500
+
+@app.route('/entry/<entry_id>')
+def get_entry(entry_id):
+    try:
+        entry = collection.find_one({"_id": ObjectId(entry_id)})
+        if entry:
+            entry['_id'] = str(entry['_id'])  # Convert ObjectId to string
+            return jsonify(entry)
+        else:
+            return jsonify({'error': 'Entry not found'}), 404
+    except Exception as e:
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
 
 @app.route('/edit_entry/<entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
-    # Route that allows users to edit an existing database entry
-    data = request.form
-    filter_criteria = {"_id": ObjectId(entry_id)}
-    update_operation = {
-        "$set": {
-            "addressLine1": data.get("addressLine1"),
-            "addressLine2": data.get("addressLine2"),
-            "city": data.get("city"),
-            "state": data.get("state"),
-            "zip": data.get("zip"),
-            "zipPlusFour": data.get("zipPlusFour"),
+    if request.method == 'GET':
+        # Display the edit form with existing entry data
+        entry = collection.find_one({"_id": ObjectId(entry_id)})
+        return render_template('maintenance_screen.html', entry=entry)
+    elif request.method == 'POST':
+        # Handle the form submission to update the entry
+        data = request.form
+        filter_criteria = {"_id": ObjectId(entry_id)}
+        update_operation = {
+            "$set": {
+                "addressLine1": data.get("addressLine1"),
+                "addressLine2": data.get("addressLine2"),
+                "city": data.get("city"),
+                "stateorprovince": data.get("stateorprovince"),
+                "zip": data.get("zip"),
+                "zipPlusFour": data.get("zipPlusFour"),
+            }
         }
-    }
 
-    collection.update_one(filter_criteria, update_operation)
-    return redirect(url_for('maintainance_screen'))  # Redirect back to the management page
+        # Perform the update operation in your MongoDB collection
+        collection.update_one(filter_criteria, update_operation)
+
+        # Redirect to the list of entries or a success page
+        return redirect('/entries')
+
 
 @app.route('/delete_entry/<entry_id>', methods=['POST'])
 def delete_entry(entry_id):
     # Route that allows users to delete a database entry
     filter_criteria = {"_id": ObjectId(entry_id)}
     collection.delete_one(filter_criteria)
-    return redirect(url_for('maintainance_screen'))  # Redirect back to the management page
+    return redirect(url_for('maintenance_screen'))  # Redirect back to the management page
 
 
 #def fuzziness():
@@ -165,3 +210,4 @@ def submit_address():
 
 if __name__ == "__main__":
     app.run()
+
