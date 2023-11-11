@@ -142,20 +142,23 @@ document.addEventListener("DOMContentLoaded", function () {
 		  validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
 		  validationResultElement.style.color = 'green';
 		  console.log('Address is valid and includes all optional elements.');
-		  console.log('Matching addresses:', data.matchingAddresses);
+		  console.log('Matching addresses:', fullAddress);
 		} 
         
         else if (data.validAddress== true && data.nearMatch === true){
         validationResultElement.textContent = "Near match found.";
         validationResultElement.style.color = 'lightgreen';
         console.log('Address is valid but is missing optional elements.');
+        console.log('Matching addresses:', fullAddress);
+
     }
 
         else if (data.validAddress === true && data.partialMatch === true){
-        validationResultElement.textContent = 'Partial match found. Did you mean';
+            validationResultElement.textContent = `Partial match found. Did you mean ${JSON.stringify(fullAddress)}`;
         validationResultElement.style.color = 'yellow';
+        validationResultElement.style.backgroundColor = 'black';
         console.log('Address is valid but is partially incorrect.');
-        console.log('Matching addresses:', data.matchingAddresses);
+        console.log('Matching addresses:', fullAddress);
         }
         else {
             // Instructions if the result is negative.
