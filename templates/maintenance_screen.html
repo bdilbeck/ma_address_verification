@@ -95,36 +95,35 @@
 <li><input type="submit" value="Submit"></li>
 </form>
 </div>
-<button>Button1</button>
-
-<h1>Entry Lookup</h1>
-<h1>Entry List</h1>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Address Line 1</th>
-            <th>Action</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for entry in entries %}
-        <tr>
-            <td>{{ entry._id }}</td>
-            <td>{{ entry.addressLine1 }}</td>
-            <td>
-                <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button>
-                <button class="delete-entry-button" data-entry-id="{{ entry._id }}">Delete</button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
 
-
-
+    <h1>Entry Lookup</h1>
+    <h1>Entry List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Address Line 1</th>
+                <!-- Add headers for other properties -->
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry._id }}</td>
+                <td>{{ entry.addressLine1 }}</td>
+                <td>
+              <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button> 
+                </td> 
+                <td>
+                    <button class="delete-entry-button" data-entry-id="{{ entry._id }}">Delete</button>
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;">
     <input type="hidden" name="entry_id" id="edit-entry-id">
     <label for="edit-addressLine1">Address Line 1:</label>
@@ -132,14 +131,12 @@
     <!-- Add other input fields for editing other properties -->
     <input type="submit" value="Save Changes">
     </form>
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    fetchEntries(); // Fetch entries when the page loads
-    addEditButtonsClickListener(); // Add click event listener to edit buttons
-    addOpenPopupClickListener(); // Add click event listener to open popup button
-    addDeleteButtonsClickListener(); 
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchEntries(); // Fetch entries when the page loads
+        addEditButtonsClickListener(); // Add click event listener to edit buttons
+        addOpenPopupClickListener(); // Add click event listener to open popup button
+    });
 function fetchEntries() {
     console.log('Fetching entries...');
 
@@ -151,6 +148,7 @@ function fetchEntries() {
             }
             return response.json();
         })
+
         .then((data) => {
             console.log('Data received from the server:', data);
 
@@ -169,6 +167,11 @@ function fetchEntries() {
                 editButton.className = 'edit-entry-button';
                 editButton.textContent = 'Edit';
                 editButton.dataset.entryId = entry._id;
+                const actionCellTwo = document.createElement('td');
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-entry-button';
+                deleteButton.textContent = 'Delete';
+                deleteButton.dataset.entryId = entry._id;               
 
                 // Attach an event listener to the "Edit" button
                 editButton.addEventListener('click', (event) => {
@@ -191,14 +194,59 @@ function fetchEntries() {
                 row.appendChild(addressLine1Cell);
                 row.appendChild(actionCell);
                 actionCell.appendChild(editButton);
+                row.appendChild(actionCellTwo);
+                actionCellTwo.appendChild(deleteButton);
 
                 tbody.appendChild(row);
             });
+            addDeleteButtonsClickListener();
         })
         .catch((error) => {
             console.error('Error fetching entries:', error);
         });
 }
+
+
+function addDeleteButtonsClickListener() {
+    console.log('Delete Buttons Click Listener');
+
+    // Attach a click event listener to the 'tbody' element
+    const tbody = document.querySelector('tbody');
+    tbody.addEventListener('click', (event) => {
+        const deleteButton = event.target.closest('.delete-entry-button');
+        if (deleteButton) {
+            event.preventDefault(); // Prevent the link from navigating
+            console.log('Default event prevented');
+
+            const entryId = deleteButton.dataset.entryId;
+            if (confirm('Are you sure you want to delete this entry?')) {
+                deleteEntry(entryId);
+            }
+        }
+    });
+}
+
+
+
+function deleteEntry(entryId) {
+    fetch(`/delete_entry/${entryId}`, {
+        method: 'POST',
+    })
+    .then((response) => {
+        if (response.ok) {
+            // Handle the success case, e.g., by updating the UI
+            fetchEntries(); // Refresh the entry list
+        } else {
+            // Handle errors, e.g., by displaying an error message
+            console.error('Entry deletion failed with status:', response.status);
+        }
+    })
+    .catch((error) => {
+        // Handle network or other errors
+        console.error('Error during entry deletion:', error);
+    });
+}
+
 
 function addEditButtonsClickListener() {
     // Add a click event listener to all elements with the class "edit-entry-button"
@@ -292,49 +340,12 @@ function populateEditForm(entry) {
     console.log('Edit form populated:', entry);
 }
 
-
-function addDeleteButtonsClickListener() {
-    console.log('Delete Buttons Click Listener');
-    document.querySelectorAll('.delete-entry-button').forEach((deleteButton) => {
-        deleteButton.addEventListener('click', (event) => {
-            console.log('Delete Buttons Click Listener Event');
-            event.preventDefault(); // Prevent the link from navigating
-
-            const entryId = deleteButton.dataset.entryId;
-            const entry = getEntryById(entryId); // Implement a function to get the entry data
-
-            if (entry) {
-                console.log('Delete Buttons Click Listener: Deleting Entry');
-                deleteEntry(entryId);
-            }
-        });
-    });
-}
-
-
-
-function deleteEntry(entryId) {
-    fetch(`/delete_entry/${entryId}`, {
-    
-        method: 'POST',
-    })
-    .then((response) => {
-        console.log('Delete Entry response');
-        if (response.ok) {
-            // Handle the success case, e.g., by updating the UI
-            fetchEntries(); // Refresh the entry list
-        } else {
-            // Handle errors, e.g., by displaying an error message
-            console.error('Entry deletion failed with status:', response.status);
-        }
-    })
-    .catch((error) => {
-        // Handle network or other errors
-        console.error('Error during entry deletion:', error);
-    });
-}
-
 </script>
+
+
+</body>
+
+</html>
 
 
 
