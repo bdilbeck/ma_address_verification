@@ -104,11 +104,13 @@ def edit_entry(entry_id):
 
 @app.route('/delete_entry/<entry_id>', methods=['POST'])
 def delete_entry(entry_id):
-    # Route that allows users to delete a database entry
-    filter_criteria = {"_id": ObjectId(entry_id)}
-    collection.delete_one(filter_criteria)
-    return redirect(url_for('maintenance_screen'))  # Redirect back to the management page
-
+    try:
+        # Route that allows users to delete a database entry
+        filter_criteria = {"_id": ObjectId(entry_id)}
+        collection.delete_one(filter_criteria)
+        return jsonify({'message': 'Entry deleted successfully'}), 200
+    except Exception as error:
+        return jsonify({'error': f'Internal server error: {error}'}), 500
 
 #def fuzziness():
         #fuzzy_match = fuzz.token_set_ratio()
@@ -202,7 +204,7 @@ def submit_address():
                     'nearMatch': near_match, 
                     'partialMatch': partial_match,
                     #'matchingAddress': found_match,
-                    'message': 'Address is valid; match found.' if valid_address else 'Address is not valid.'} 
+                    'message': f'Address is valid; match found. Match{found_match}' if valid_address else 'Address is not valid.'} 
         return jsonify(response), 200
     except Exception as error: # Handles server errors
         return jsonify({f'error': 'Internal server error: {error}'}), 500
