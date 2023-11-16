@@ -165,6 +165,9 @@ def submit_address():
         valid_address = found_match is not None
 
         address_match = (
+            fuzz.ratio(found_match.get('addressLine1'), entered_addresslineone) > 80
+        )
+        address_match = (
                         found_match.get('addressLine1') == entered_addresslineone and
                         found_match.get('city') == entered_city and 
                         found_match.get('stateorprovince') == entered_state and 
@@ -204,6 +207,7 @@ def submit_address():
                     'nearMatch': near_match, 
                     'partialMatch': partial_match,
                     #'matchingAddress': found_match,
+                    'fuzzRatio':fuzz.ratio(found_match.get('addressLine1'), entered_addresslineone) > 80,
                     'message': f'Address is valid; match found. Match{found_match}' if valid_address else 'Address is not valid.'} 
         return jsonify(response), 200
     except Exception as error: # Handles server errors
