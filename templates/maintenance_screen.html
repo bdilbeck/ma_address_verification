@@ -3,84 +3,84 @@
 <head>
     <title>Maintenance Page</title>
 <style>
-    body {
-    font-family: 'Helvetica Now Display', sans-serif;
-    background-color: #fafafa;
-    text-align: center;
-    padding: 50px;
-}
-
-h1 {
-    color: #070606;
-    margin-bottom: 20px;
-    font-size: 50px;
-}
-
-form {
-    background-color: #f0f0f0;
-    padding: 20px;
-    border-radius: 10px;
-    display: inline-block;
-    width: 100%;
-    max-width: 500px;
-    list-style-type: none; /* Removes bullet points */
-}
-
-label, input, select, button {
-    margin-bottom: 10px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-input[type="submit"], button {
-    background-color: #492d8c;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-}
-
-input[type="submit"]:hover, button:hover {
-    background-color: #2e67b2;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f0f0f0;
-}
-
-/* Additional styles for popup */
-#popup {
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    padding: 20px;
-    display: inline-block;
-    width: 100%;
-    max-width: 500px;
-    margin-top: 20px;
-}
-
-/* Style adjustments for smaller screens */
-@media screen and (max-width: 600px) {
-    form, #popup {
-        width: 95%;
-    }
-}
-</style>
-
+        body {
+            font-family: 'Helvetica Now Display', sans-serif;
+            background-color: #fafafa;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        h1, h4 {
+            color: #070606;
+            margin-bottom: 20px;
+        }
+        
+    
+        button, input[type="submit"] {
+            background-color: #2e67b2;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        
+        #openPopup {
+            max-width: 15%;
+        }
+        
+        
+        form {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto; 
+        }
+        
+        label, input, select {
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        
+        form li {
+            list-style-type: none;
+        }
+        
+        
+        button:hover, input[type="submit"]:hover {
+            background-color: #1a4b8b;
+        }
+        
+       
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+        
+        th {
+            background-color: #f0f0f0;
+        }
+        
+       
+        #edit-form {
+            display: none; 
+            margin-top: 20px;
+        }
+        </style>
 </head>
 <body>
     <h1>Maintenance Page</h1>
