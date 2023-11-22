@@ -85,93 +85,90 @@
 <li><input type="text" name="zip" id="zip" size="5" /></li>
 
 <li><label for="zip +4">ZIP Code +4:</label></li>
-<li><input type="text" name="zip +4" size="4" id="zipPlusFour"/></li>
+<li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
 </select></li>
 
 <li><input type="submit" value="Submit"></li>
 </form>
 <div id="validationResult"></div>
 <script>
-
-	// Makes the script wait for HTML before executing
-document.addEventListener("DOMContentLoaded", function () {
-  console.log('JavaScript code is executing'); // Debugging tool, indicates in console log that the JS is active
-
-  // Adds the event listener to the webpage. The event listener waits for the submit button to be pressed, executing once it is.
-  document.getElementById('addressForm').addEventListener('submit', function (e) {
-      e.preventDefault(); // Prevents the default submission behavior so JS can take the data, send request to server, and return a response
-      console.log('Submit button event listener is called.'); //Another debug tool to confirm the event listener is operational
-      
-	  const addressLine1 = document.getElementById('addressLine1').value; // Obtains the user-entered value of 'addressLine1'
-    const addressLine2 = document.getElementById('addressLine2').value; 
-	  const city = document.getElementById('city').value;
-	  const stateorprovince = document.getElementById('stateorprovince').value;
-	  const country = document.getElementById('country').value;
-	  const zip = document.getElementById('zip').value;
-	  const zipPlusFour = document.getElementById('zipPlusFour').value;    
-	  
-
-	  const fullAddress ={
-        addressLine1: addressLine1,
-        ...(addressLine2 && { addressLine2: addressLine2 }),
-        city: city,		
-		stateorprovince: stateorprovince,
-		country: country,
-		zip: zip,
-    ...(zipPlusFour && { zipPlusFour: zipPlusFour })
-
-	  };
-  
-	  // Sends the POST API request to the endpoint, '/submitAddress'
-      fetch('/submitAddress', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(fullAddress), // Converts the JS object into a JSON string.
-      })
-      .then(response => response.json()) //Converts JSON response into a JS object
-	  .then(data => {
-		console.log('Server Response:', data);
-		const validationResultElement = document.getElementById('validationResult'); // finds the html element with the id 'validationResult'
-
-	    matchingAddresses = data.found_match
-
-		if (data.validAddress === true && data.perfectMatch === true) {
-		  // Instructions if the result is positive.
-		  validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
-		  validationResultElement.style.color = 'green';
-		  console.log('Address is valid and includes all optional elements.');
-		  console.log('Matching addresses:', fullAddress);
-		} 
-        
-        else if (data.validAddress== true && data.nearMatch === true){
-        validationResultElement.textContent = "Near match found.";
-        validationResultElement.style.color = 'lightgreen';
-        console.log('Address is valid but is missing optional elements.');
-        console.log('Matching addresses:', fullAddress);
-
-    }
-
-        else if (data.validAddress === true && data.partialMatch === true){
-            validationResultElement.textContent = `Partial match found. Did you mean ${JSON.stringify(fullAddress)}`;
-        validationResultElement.style.color = 'yellow';
-        validationResultElement.style.backgroundColor = 'black';
-        console.log('Address is valid but is partially incorrect.');
-        console.log('Matching addresses:', fullAddress);
-        }
-        else {
-            // Instructions if the result is negative.
-            validationResultElement.textContent = 'Matching address not found.';
-            validationResultElement.style.color = 'red';
-            console.log('Address is not valid');
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log('JavaScript code is executing');
+    
+      document.getElementById('addressForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          console.log('Submit button event listener is called.');
+    
+          const addressLine1 = document.getElementById('addressLine1').value;
+          const addressLine2 = document.getElementById('addressLine2').value;
+          const city = document.getElementById('city').value;
+          const stateorprovince = document.getElementById('stateorprovince').value;
+          const country = document.getElementById('country').value;
+          const zip = document.getElementById('zip').value;
+          const zipplusfour = document.getElementById('zipplusfour').value;
+    
+          const fullAddress ={
+            addressLine1: addressLine1,
+            ...(addressLine2 && { addressLine2: addressLine2 }),
+            city: city,
+            stateorprovince: stateorprovince,
+            country: country,
+            zip: zip,
+            ...(zipplusfour && { zipplusfour: zipplusfour })
+          };
+    
+          fetch('/submitAddress', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(fullAddress),
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Server Response:', data);
+    
+            // Add logs to check the values
+            console.log('validAddress:', data.validAddress);
+            console.log('perfectMatch:', data.perfectMatch);
+            console.log('nearMatch:', data.nearMatch);
+            console.log('partialMatch:', data.partialMatch);
+            console.log('found_match:', data.found_match);
+    
+            const validationResultElement = document.getElementById('validationResult');
+    
+            matchingAddresses = data.found_match
+    
+            if (data.validAddress === true && data.perfectMatch === true) {
+              validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
+              validationResultElement.style.color = 'green';
+              console.log('Address is valid and includes all optional elements.');
+              console.log('Matching addresses:', fullAddress);
             }
-	  })
-      .catch(error => {
-          console.error('Error:', error);
+            else if (data.validAddress == true && data.nearMatch == true) {
+              validationResultElement.textContent = "Near match found.";
+              validationResultElement.style.color = 'lightgreen';
+              console.log('Address is valid but is missing optional elements.');
+              console.log('Matching addresses:', fullAddress);
+            }
+            else if (data.validAddress === true && data.partialMatch === true) {
+              validationResultElement.textContent = `Partial match found. Did you mean addressLine1:${JSON.stringify(matchingAddresses.addressLine1)} addressLine2:${JSON.stringify(matchingAddresses.addressLine2)} city:${JSON.stringify(matchingAddresses.city)} country:${JSON.stringify(matchingAddresses.country)} state:${JSON.stringify(matchingAddresses.state)} zip:${JSON.stringify(matchingAddresses.zip)} zip +4:${JSON.stringify(matchingAddresses.zipplusfour)}  `;
+              validationResultElement.style.color = 'yellow';
+              validationResultElement.style.backgroundColor = 'black';
+              console.log('Address is valid but is partially incorrect.');
+              console.log('Matching addresses:', fullAddress);
+            }
+            else {
+              validationResultElement.textContent = 'Matching address not found.';
+              validationResultElement.style.color = 'red';
+              console.log('Address is not valid');
+            }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
       });
-  });
-});
-      </script>
+    });
+    </script>
 </body>
 </html>
