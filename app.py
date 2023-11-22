@@ -2,6 +2,8 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 from pymongo import MongoClient
 from fuzzywuzzy import fuzz, process
 from bson.objectid import ObjectId
+from bson.json_util import dumps, loads
+from flask.json import jsonify
 
 app = Flask(__name__)
 
@@ -15,7 +17,7 @@ except Exception as error: # Prints an error if the connection fails.
 
 
 db = connection['ma_avs_addresses'] # Specifies the name of the database being connected to
-collection = db['ma_avs_addresses'] # Specifies the collection
+collection = db['ma_avs_addresses2'] # Specifies the collection
 
 @app.route('/') # The address entry page
 def run_ui():
@@ -50,7 +52,6 @@ def entry_list_json():
 def database_management():
     # Logic to retrieve and display database entries
     return render_template('maintenance_screen.html')
-
 @app.route('/new_entry', methods=['GET','POST'])
 def new_entry():
     if request.method == 'POST':
@@ -91,7 +92,7 @@ def edit_entry(entry_id):
                 "city": data.get("city"),
                 "stateorprovince": data.get("stateorprovince"),
                 "zip": data.get("zip"),
-                "zipPlusFour": data.get("zipPlusFour"),
+                "zipplusfour": data.get("zipplusfour"),
             }
         }
 
@@ -130,12 +131,14 @@ def submit_address():
         entered_state = data.get('stateorprovince') 
         entered_country = data.get('country')
         entered_zip = data.get('zip') 
-        entered_zipplusfour = data.get('zipPlusFour')      
+        entered_zipplusfour = data.get('zipplusfour')      
+
+        print('Received request:', data)
 
         found_address = []
         match_score = 0
 
-        # Query the MongoDB database looking for a match to addressLine1
+        # Query the MongoDB database looking for a match
         found_match = collection.find_one({
              '$or' :[
             {'addressLine1' : entered_addresslineone,
@@ -144,7 +147,7 @@ def submit_address():
             'stateorprovince' : entered_state,
             'country' : entered_country,
             'zip' : entered_zip,
-            'zipPlusFour': entered_zipplusfour        
+            'zipplusfour': entered_zipplusfour        
                                            },
            { 'addressLine1' : entered_addresslineone,
                                         'city' : entered_city,
@@ -156,11 +159,15 @@ def submit_address():
                                   {
                                         'zip' : entered_zip
                                         }
-]
+]   
    })
+        # Create a variable to represent the found match
+ 
+        #if found_match.get('zip') ==# entered_zip:
 
-        #if found_match.get('zip') == entered_zip:
             #zip_match = True
+
+        print('Found Match:', found_match)
 
         valid_address = found_match is not None
 
@@ -183,7 +190,7 @@ def submit_address():
         found_match.get('stateorprovince') == entered_state and
         found_match.get('country') == entered_country and
         found_match.get('zip') == entered_zip and
-        (found_match.get('addressLine2') != entered_addresslinetwo or found_match.get('zipPlusFour') != entered_zipplusfour))
+        (found_match.get('addressLine2') != entered_addresslinetwo or found_match.get('zipplusfour') != entered_zipplusfour))
 
         perfect_match = (
         found_match.get('addressLine1') == entered_addresslineone and 
@@ -192,7 +199,7 @@ def submit_address():
         found_match.get('country') == entered_country and
         found_match.get('addressLine2') == entered_addresslinetwo and
         found_match.get('zip') == entered_zip and
-        found_match.get('zipPlusFour') == entered_zipplusfour)
+        found_match.get('zipplusfour') == entered_zipplusfour)
 # Near match - 5 digit zip code
 # Perfect match - zip code +4, addressLine2 if it's available
 
@@ -206,14 +213,24 @@ def submit_address():
                     'perfectMatch': perfect_match,
                     'nearMatch': near_match, 
                     'partialMatch': partial_match,
-                    #'matchingAddress': found_match,
+                    'found_match': found_match,
                     'fuzzRatio':fuzz.ratio(found_match.get('addressLine1'), entered_addresslineone) > 80,
                     'message': f'Address is valid; match found. Match{found_match}' if valid_address else 'Address is not valid.'} 
-        return jsonify(response), 200
-    except Exception as error: # Handles server errors
-        return jsonify({f'error': 'Internal server error: {error}'}), 500
+        
+                # Convert the response to JSON
+        
+        json_response = dumps(response)
+
+        
+        print('Sending Response:', response)
+
+        return json_response, 200
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Internal server error: {error}'}), 500
+
 
 
 if __name__ == "__main__":
     app.run()
-
