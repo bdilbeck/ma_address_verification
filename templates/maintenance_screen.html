@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Maintenance Page</title>
-<style>
+    <style>
         body {
             font-family: 'Helvetica Now Display', sans-serif;
             background-color: #fafafa;
@@ -81,6 +81,7 @@
             margin-top: 20px;
         }
         </style>
+
 </head>
 <body>
     <h1>Maintenance Page</h1>
@@ -91,14 +92,14 @@
 <button id="openPopup">Add New Address</button>
 <div id="popup" style="display: none;">
 <form id="popupForm" action="/new_entry" method="post"><li><label for="AddressLine1">Address Line 1:</label></li>
-<li><input type="text" name="addressLine1" id="addressLine1" size="60" /></li>
+<li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
 <li><label for="addressLine2">Address Line 2: </label></li>
 <li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
 <li><label for="city">City:</label></li>
-<li><input type="text" name="city" id="city" size="20" /></li>
+<li><input type="text" name="city" id="city" size="20" required/></li>
 
 <li><label for="country">Country:</label></li>
-<li><select name="country" id="country">
+<li><select name="country" id="country" required>
 <option selected="" value="Default">(Please select a country)</option>
 <option value="US" id="US">USA</option>
 <option value="CA" id="CA">Canada</option>
@@ -106,7 +107,7 @@
 
 <li><label for="stateorprovince">State/Province:</label></li>
 <li>
-    <select name="stateorprovince" id="stateorprovince">
+    <select name="stateorprovince" id="stateorprovince" required>
         <option selected="" value="Default">(Please select a state)</option>
         <option value="AL" id="AL">Alabama (AL)</option>
         <option value="AK" id="AK">Alaska (AK)</option>
@@ -164,10 +165,10 @@
 </li>
 
 <li><label for="zip">ZIP Code:</label></li>
-<li><input type="text" name="zip" id="zip" size="5" /></li>
+<li><input type="text" name="zip" id="zip" size="5" required/></li>
 
 <li><label for="zip +4">ZIP Code +4:</label></li>
-<li><input type="text" name="zip +4" size="4" id="zipPlusFour"/></li>
+<li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
 
 <li><input type="submit" value="Submit"></li>
 </form>
@@ -176,13 +177,22 @@
 
     <h1>Entry Lookup</h1>
     <h1>Entry List</h1>
+    <input type="text" id="searchInput" placeholder="Search addresses">
     <table>
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Address Line 1</th>
-                <!-- Add headers for other properties -->
-                <th>Action</th>
+                <thead>
+                        <th>ID</th>
+                        <th>Address Line 1</th>
+                        <th>Address Line 2</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Country</th>
+                        <th>ZIP Code</th>
+                        <th>ZIP Code +4</th>
+                        <th>Action</th>
+                        <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -190,6 +200,14 @@
             <tr>
                 <td>{{ entry._id }}</td>
                 <td>{{ entry.addressLine1 }}</td>
+                <td>{{ entry.addressLine2 }}</td>       
+                <td>{{ entry.city }}</td>        
+                <td>{{ entry.state }}</td>  
+                <td>{{ entry.country }}</td>  
+                <td>{{ entry.zip }}</td>               
+                <td>{{ entry.zipplusfour }}</td>               
+            
+             
                 <td>
               <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button> 
                 </td> 
@@ -205,91 +223,159 @@
     <input type="hidden" name="entry_id" id="edit-entry-id">
     <label for="edit-addressLine1">Address Line 1:</label>
     <input type="text" name="addressLine1" id="edit-addressLine1">
-    <!-- Add other input fields for editing other properties -->
+    <input type="text" name="addressLine2" id="edit-addressLine2">
+    <input type="text" name="city" id="edit-city">
+    <input type="text" name="stateorprovince" id="edit-stateorprovince">
+    <input type="text" name="country" id="edit-country">
+    <input type="text" name="zip" id="edit-zip">
+    <input type="text" name="zipplusfour" id="edit-zipplusfour">
+
     <input type="submit" value="Save Changes">
     </form>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         fetchEntries(); // Fetch entries when the page loads
-        addEditButtonsClickListener(); // Add click event listener to edit buttons
         addOpenPopupClickListener(); // Add click event listener to open popup button
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', fetchEntries);
+        searchInput.addEventListener('change', fetchEntries);
     });
-function fetchEntries() {
-    console.log('Fetching entries...');
-
-    fetch('/entries-json')
-        .then((response) => {
-            console.log('Response status:', response.status);
-            if (!response.ok) {
-                throw new Error(`Fetch failed with status: ${response.status}`);
-            }
-            return response.json();
-        })
-
-        .then((data) => {
-            console.log('Data received from the server:', data);
-
-            const entries = data.entries;
-            const tbody = document.querySelector('tbody');
-            tbody.innerHTML = '';
-
-            entries.forEach((entry) => {
-                const row = document.createElement('tr');
-                const idCell = document.createElement('td');
-                idCell.textContent = entry._id;
-                const addressLine1Cell = document.createElement('td');
-                addressLine1Cell.textContent = entry.addressLine1;
-                const actionCell = document.createElement('td');
-                const editButton = document.createElement('button');
-                editButton.className = 'edit-entry-button';
-                editButton.textContent = 'Edit';
-                editButton.dataset.entryId = entry._id;
-                const actionCellTwo = document.createElement('td');
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-entry-button';
-                deleteButton.textContent = 'Delete';
-                deleteButton.dataset.entryId = entry._id;               
-
-                // Attach an event listener to the "Edit" button
-                editButton.addEventListener('click', (event) => {
-                    event.preventDefault(); // Prevent the link from navigating
-
-                    const entryId = entry._id;
-                    getEntryById(entryId)
-                        .then((entry) => {
-                            if (entry) {
-                                // Populate the edit form with the entry data and show it
-                                populateEditForm(entry);
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Error fetching entry by ID:', error);
-                        });
+    
+    function fetchEntries() {
+        console.log('Fetching entries...');
+    
+        fetch('/entries-json')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Fetch failed with status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log('Data received from the server:', data);
+    
+                const entries = data.entries;
+                const tbody = document.querySelector('tbody');
+                const searchInput = document.getElementById('searchInput').value.toLowerCase();
+                tbody.innerHTML = '';
+    
+                entries.forEach((entry) => {
+                    // Check if addressLine1 is defined before accessing its value
+                    if (entry.addressLine1 && entry.addressLine1.toLowerCase().includes(searchInput) ||
+                        (entry.addressLine2 && entry.addressLine2.toLowerCase().includes(searchInput)) ||
+                        (entry.city && entry.city.toLowerCase().includes(searchInput)) ||
+                        (entry.stateorprovince && entry.stateorprovince.toLowerCase().includes(searchInput)) ||
+                        (entry.country && entry.country.toLowerCase().includes(searchInput)) ||
+                        (entry.zip && entry.zip.toLowerCase().includes(searchInput)) ||
+                        (entry.zipplusfour && entry.zipplusfour.toLowerCase().includes(searchInput))
+                    ) {
+                        // Only add the row if it matches the search input
+                        const row = createRow(entry);
+                        tbody.appendChild(row);
+                    }
                 });
-
-                row.appendChild(idCell);
-                row.appendChild(addressLine1Cell);
-                row.appendChild(actionCell);
-                actionCell.appendChild(editButton);
-                row.appendChild(actionCellTwo);
-                actionCellTwo.appendChild(deleteButton);
-
-                tbody.appendChild(row);
+    
+                addEditButtonsClickListener();
+                addDeleteButtonsClickListener();
+            })
+            .catch((error) => {
+                console.error('Error fetching entries:', error);
             });
-            addDeleteButtonsClickListener();
-        })
-        .catch((error) => {
-            console.error('Error fetching entries:', error);
-        });
+    }
+    
+
+    
+// Create a separate function to generate a row for an entry
+function createRow(entry) {
+    const row = document.createElement('tr');
+    // ... (same code as before for creating cells)
+    const idCell = document.createElement('td');
+
+    idCell.textContent = entry._id;
+
+    const addressLine1Cell = document.createElement('td');
+    addressLine1Cell.textContent = entry.addressLine1;
+
+    const addressLine2Cell = document.createElement('td');
+    addressLine2Cell.textContent = entry.addressLine2;
+
+    const cityCell = document.createElement('td');
+    cityCell.textContent = entry.city;
+
+    const stateCell = document.createElement('td');
+    stateCell.textContent = entry.state;
+
+    const countryCell = document.createElement('td');
+    countryCell.textContent = entry.country;
+
+    const zipCell = document.createElement('td');
+    zipCell.textContent = entry.zip;
+
+    const zipplusfourCell = document.createElement('td');
+    zipplusfourCell.textContent = entry.zipplusfour;
+
+
+    const actionCell = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.classList.add('edit-entry-button'); 
+    editButton.textContent = 'Edit';
+    editButton.dataset.entryId = entry._id;
+    
+
+    const actionCellTwo = document.createElement('td');
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-entry-button';
+    deleteButton.textContent = 'Delete';
+    deleteButton.dataset.entryId = entry._id;
+
+    // Attach an event listener to the "Edit" button
+    editButton.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent the link from navigating
+
+        const entryId = entry._id;
+        getEntryById(entryId)
+            .then((entry) => {
+                if (entry) {
+                    // Populate the edit form with the entry data and show it
+                    populateEditForm(entry);
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching entry by ID:', error);
+            });
+    });
+
+    row.appendChild(idCell);
+    row.appendChild(addressLine1Cell);
+    row.appendChild(addressLine2Cell);
+    row.appendChild(cityCell);
+    row.appendChild(stateCell);
+    row.appendChild(countryCell);
+    row.appendChild(zipCell);
+    row.appendChild(zipplusfourCell);
+
+    actionCell.appendChild(editButton);
+    row.appendChild(actionCell);
+    row.appendChild(actionCellTwo);
+    actionCellTwo.appendChild(deleteButton);
+
+    return row;
 }
+    
+    function createTableCell(text) {
+        const cell = document.createElement('td');
+        cell.textContent = text;
+        return cell;
+    }
+    
 
 
 function addDeleteButtonsClickListener() {
     console.log('Delete Buttons Click Listener');
 
     // Attach a click event listener to the 'tbody' element
-    const tbody = document.querySelector('tbody');
-    tbody.addEventListener('click', (event) => {
+    const table = document.querySelector('table');
+    table.addEventListener('click', (event) => { 
         const deleteButton = event.target.closest('.delete-entry-button');
         if (deleteButton) {
             event.preventDefault(); // Prevent the link from navigating
@@ -326,21 +412,35 @@ function deleteEntry(entryId) {
 
 
 function addEditButtonsClickListener() {
+    console.log('Add Edit Buttons Click Listener');
+
     // Add a click event listener to all elements with the class "edit-entry-button"
-    document.querySelectorAll('.edit-entry-button').forEach((editButton) => {
-        editButton.addEventListener('click', (event) => {
+    const tbody = document.querySelector('tbody');
+
+    tbody.addEventListener('click', (event) => {
+        const editButton = event.target.closest('.edit-entry-button');
+        if (editButton) {
             event.preventDefault(); // Prevent the link from navigating
 
             const entryId = editButton.dataset.entryId;
-            const entry = getEntryById(entryId); // Implement a function to get the entry data
-
-            if (entry) {
-                // Populate the edit form with the entry data and show it
-                populateEditForm(entry);
+            try {
+                const entry = getEntryById(entryId)
+                    .then((entry) => {
+                        if (entry) {
+                            // Populate the edit form with the entry data and show it
+                            populateEditForm(entry);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching entry by ID:', error);
+                    });
+            } catch (error) {
+                console.error('Error fetching entry by ID:', error);
             }
-        });
+        }
     });
 }
+
 
 function addOpenPopupClickListener() {
     const openButton = document.getElementById('openPopup');
@@ -409,6 +509,13 @@ function populateEditForm(entry) {
     // Example code to populate form fields (adjust based on your HTML structure)
     document.getElementById('edit-entry-id').value = entry._id;
     document.getElementById('edit-addressLine1').value = entry.addressLine1;
+    document.getElementById('edit-addressLine2').value = entry.addressLine2;
+    document.getElementById('edit-city').value = entry.city;
+    document.getElementById('edit-stateorprovince').value = entry.stateorprovince;
+    document.getElementById('edit-country').value = entry.country;
+    document.getElementById('edit-zip').value = entry.zip;
+    document.getElementById('edit-zipplusfour').value = entry.zipplusfour;
+
 
     const editForm = document.getElementById('edit-form');
     editForm.action = `/edit_entry/${entry._id}`;
@@ -424,8 +531,3 @@ function populateEditForm(entry) {
 
 </html>
 
-
-
-</body>
-
-</html>
