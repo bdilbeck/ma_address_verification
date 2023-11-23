@@ -84,11 +84,10 @@
 
 </head>
 <body>
-    <h1>Maintenance Page</h1>
+    <h1>Address Verification - Maintenance Page</h1>
     <h4>Use this page to add, edit, and delete records in the database.</h4>
 
 
-<h1>Address Verification</h1>
 <button id="openPopup">Add New Address</button>
 <div id="popup" style="display: none;">
 <form id="popupForm" action="/new_entry" method="post"><li><label for="AddressLine1">Address Line 1:</label></li>
@@ -176,12 +175,12 @@
 
 
     <h1>Entry Lookup</h1>
-    <h1>Entry List</h1>
     <input type="text" id="searchInput" placeholder="Search addresses">
     <table>
         <thead>
             <tr>
-                <th>ID</th>
+                <th colspan="10">Addresses</th>
+            </tr>
                 <thead>
                         <th>ID</th>
                         <th>Address Line 1</th>
@@ -370,25 +369,28 @@ function createRow(entry) {
     
 
 
-function addDeleteButtonsClickListener() {
-    console.log('Delete Buttons Click Listener');
-
-    // Attach a click event listener to the 'tbody' element
-    const table = document.querySelector('table');
-    table.addEventListener('click', (event) => { 
-        const deleteButton = event.target.closest('.delete-entry-button');
-        if (deleteButton) {
-            event.preventDefault(); // Prevent the link from navigating
-            console.log('Default event prevented');
-
-            const entryId = deleteButton.dataset.entryId;
-            if (confirm('Are you sure you want to delete this entry?')) {
-                deleteEntry(entryId);
+    function addDeleteButtonsClickListener() {
+        console.log('Delete Buttons Click Listener');
+    
+        // Attach a click event listener to the 'tbody' element
+        const table = document.querySelector('table');
+        table.addEventListener('click', async (event) => { 
+            const deleteButton = event.target.closest('.delete-entry-button');
+            if (deleteButton) {
+                event.preventDefault(); // Prevent the link from navigating
+                console.log('Delete button clicked');
+    
+                const entryId = deleteButton.dataset.entryId;
+                const confirmed = confirm('Are you sure you want to delete this entry?');
+    
+                if (confirmed) {
+                    await deleteEntry(entryId);
+                    fetchEntries(); // Refresh the entry list
+                }
             }
-        }
-    });
-}
-
+        });
+    }
+    
 
 
 function deleteEntry(entryId) {
