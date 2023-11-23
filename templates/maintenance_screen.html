@@ -202,7 +202,7 @@
                 <td>{{ entry.addressLine1 }}</td>
                 <td>{{ entry.addressLine2 }}</td>       
                 <td>{{ entry.city }}</td>        
-                <td>{{ entry.state }}</td>  
+                <td>{{ entry.stateorprovince }}</td>  
                 <td>{{ entry.country }}</td>  
                 <td>{{ entry.zip }}</td>               
                 <td>{{ entry.zipplusfour }}</td>               
@@ -240,7 +240,7 @@
         searchInput.addEventListener('input', fetchEntries);
         searchInput.addEventListener('change', fetchEntries);
     });
-    
+
     function fetchEntries() {
         console.log('Fetching entries...');
     
@@ -303,7 +303,7 @@ function createRow(entry) {
     cityCell.textContent = entry.city;
 
     const stateCell = document.createElement('td');
-    stateCell.textContent = entry.state;
+    stateCell.textContent = entry.stateorprovince;
 
     const countryCell = document.createElement('td');
     countryCell.textContent = entry.country;
@@ -530,4 +530,3 @@ function populateEditForm(entry) {
 </body>
 
 </html>
-
