@@ -3,20 +3,67 @@
 <head>
     <title>Address Lookup</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
-
+    <style>    
+            body {
+                font-family: 'Helvetica Now Display', sans-serif;
+                background-color: #fafafa;
+                text-align: center;
+                padding: 50px;
+            }
+            
+            h1 {
+                color: #070606;
+                margin-bottom: 20px;
+                font-size: 50px;
+            }
+            
+            form {
+                background-color: #f0f0f0;
+                padding: 20px;
+                border-radius: 10px;
+                display: inline-block;
+                width: 100%;
+                max-width: 500px;
+                list-style-type: none;
+            }
+            
+            label, input, select {
+                margin-bottom: 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            input[type="submit"] {
+                background-color: #492d8c;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                width: 100%;
+            }
+            
+            input[type="submit"]:hover {
+                background-color: #2e67b2;
+            }
+            
+            #validationResult {
+                margin-top: 20px;
+            }
+    </style>
 </head>
 <body>
 <h1>Address Verification</h1>
 <form id="addressForm">
 <li><label for="AddressLine1">Address Line 1:</label></li>
-<li><input type="text" name="addressLine1" id="addressLine1" size="60" /></li>
+<li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
 <li><label for="addressLine2">Address Line 2: </label></li>
 <li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
 <li><label for="city">City:</label></li>
-<li><input type="text" name="city" id="city" size="20" /></li>
+<li><input type="text" name="city" id="city" size="20" required/></li>
 
 <li><label for="country">Country:</label></li>
-<li><select name="country" id="country">
+<li><select name="country" id="country" required>
 <option selected="" value="Default">(Please select a country)</option>
 <option value="US" id="US">USA</option>
 <option value="CA" id="CA">Canada</option>
@@ -24,7 +71,7 @@
 
 <li><label for="stateorprovince">State/Province:</label></li>
 <li>
-    <select name="stateorprovince" id="stateorprovince">
+    <select name="stateorprovince" id="stateorprovince" required>
         <option selected="" value="Default">(Please select a state)</option>
         <option value="AL" id="AL">Alabama (AL)</option>
         <option value="AK" id="AK">Alaska (AK)</option>
@@ -82,7 +129,7 @@
 </li>
 
 <li><label for="zip">ZIP Code:</label></li>
-<li><input type="text" name="zip" id="zip" size="5" /></li>
+<li><input type="text" name="zip" id="zip" size="5" required/></li>
 
 <li><label for="zip +4">ZIP Code +4:</label></li>
 <li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
