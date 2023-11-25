@@ -55,92 +55,90 @@
 <body>
 <h1>Address Verification</h1>
 <form id="addressForm">
-<li><label for="AddressLine1">Address Line 1:</label></li>
-<li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
-<li><label for="addressLine2">Address Line 2: </label></li>
-<li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
-<li><label for="city">City:</label></li>
-<li><input type="text" name="city" id="city" size="20" required/></li>
+    <li><label for="addressLine1">Address Line 1:</label></li>
+    <li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
+    <li><label for="addressLine2">Address Line 2: </label></li>
+    <li><input type="text" name="addressLine2" id="addressLine2" size="60" placeholder="Apartment/Suite #, etc." /></li>
+    <li><label for="city">City:</label></li>
+    <li><input type="text" name="city" id="city" size="20" required/></li>
 
-<li><label for="country">Country:</label></li>
-<li><select name="country" id="country" required>
-<option selected="" value="Default">(Please select a country)</option>
-<option value="US" id="US">USA</option>
-<option value="CA" id="CA">Canada</option>
-</select></li>
+    <li><label for="country">Country:</label></li>
+    <li>
+        <select name="country" id="country" required onchange="updateStateOptions()">
+            <option selected="" value="Default">(Please select a country)</option>
+            <option value="US" id="US">USA</option>
+            <option value="CA" id="CA">Canada</option>
+        </select>
+    </li>
 
-<li><label for="stateorprovince">State/Province:</label></li>
-<li>
-    <select name="stateorprovince" id="stateorprovince" required>
-        <option selected="" value="Default">(Please select a state)</option>
-        <option value="AL" id="AL">Alabama (AL)</option>
-        <option value="AK" id="AK">Alaska (AK)</option>
-        <option value="AZ" id="AZ">Arizona (AZ)</option>
-        <option value="AR" id="AR">Arkansas (AR)</option>
-        <option value="CA" id="CA">California (CA)</option>
-        <option value="CO" id="CO">Colorado (CO)</option>
-        <option value="CT" id="CT">Connecticut (CT)</option>
-        <option value="DE" id="DE">Delaware (DE)</option>
-        <option value="DC" id="DC">District Of Columbia (DC)</option>
-        <option value="FL" id="FL">Florida (FL)</option>
-        <option value="GA" id="GA">Georgia (GA)</option>
-        <option value="HI" id="HI">Hawaii (HI)</option>
-        <option value="ID" id="ID">Idaho (ID)</option>
-        <option value="IL" id="IL">Illinois (IL)</option>
-        <option value="IN" id="IN">Indiana (IN)</option>
-        <option value="IA" id="IA">Iowa (IA)</option>
-        <option value="KS" id="KS">Kansas (KS)</option>
-        <option value="KY" id="KY">Kentucky (KY)</option>
-        <option value="LA" id="LA">Louisiana (LA)</option>
-        <option value="ME" id="ME">Maine (ME)</option>
-        <option value="MD" id="MD">Maryland (MD)</option>
-        <option value="MA" id="MA">Massachusetts (MA)</option>
-        <option value="MI" id="MI">Michigan (MI)</option>
-        <option value="MN" id="MN">Minnesota (MN)</option>
-        <option value="MS" id="MS">Mississippi (MS)</option>
-        <option value="MO" id="MO">Missouri (MO)</option>
-        <option value="MT" id="MT">Montana (MT)</option>
-        <option value="NE" id="NE">Nebraska (NE)</option>
-        <option value="NV" id="NV">Nevada (NV)</option>
-        <option value="NH" id="NH">New Hampshire (NH)</option>
-        <option value="NJ" id="NJ">New Jersey (NJ)</option>
-        <option value="NM" id="NM">New Mexico (NM)</option>
-        <option value="NY" id="NY">New York (NY)</option>
-        <option value="NC" id="NC">North Carolina (NC)</option>
-        <option value="ND" id="ND">North Dakota (ND)</option>
-        <option value="OH" id="OH">Ohio (OH)</option>
-        <option value="OK" id="OK">Oklahoma (OK)</option>
-        <option value="OR" id="OR">Oregon (OR)</option>
-        <option value="PA" id="PA">Pennsylvania (PA)</option>
-        <option value="RI" id="RI">Rhode Island (RI)</option>
-        <option value="SC" id="SC">South Carolina (SC)</option>
-        <option value="SD" id="SD">South Dakota (SD)</option>
-        <option value="TN" id="TN">Tennessee (TN)</option>
-        <option value="TX" id="TX">Texas (TX)</option>
-        <option value="UT" id="UT">Utah (UT)</option>
-        <option value="VT" id="VT">Vermont (VT)</option>
-        <option value="VA" id="VA">Virginia (VA)</option>
-        <option value="WA" id="WA">Washington (WA)</option>
-        <option value="DC" id="DC">Washington DC (DC)</option>
-        <option value="WV" id="WV">West Virginia (WV)</option>
-        <option value="WI" id="WI">Wisconsin (WI)</option>
-        <option value="WY" id="WY">Wyoming (WY)</option>
-    </select>
-</li>
+    <li><label for="stateorprovince">State/Province:</label></li>
+    <li>
+        <select name="stateorprovince" id="stateorprovince" required>
+            <option selected="" value="Default">(Please select a state/province)</option>
+            <!-- Options will be dynamically populated based on the selected country -->
+        </select>
+    </li>
 
-<li><label for="zip">ZIP Code:</label></li>
-<li><input type="text" name="zip" id="zip" size="5" required/></li>
+    <li><label for="zip">ZIP Code:</label></li>
+    <li><input type="text" name="zip" id="zip" size="5" required/></li>
 
-<li><label for="zip +4">ZIP Code +4:</label></li>
-<li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
-</select></li>
+    <li><label for="zip +4">ZIP Code +4:</label></li>
+    <li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
 
-<li><input type="submit" value="Submit"></li>
+    <li><input type="submit" value="Submit"></li>
+</ul>
 </form>
 <div id="validationResult"></div>
+
 <script>
+    function updateStateOptions() {
+        const countryDropdown = document.getElementById('country');
+        const stateDropdown = document.getElementById('stateorprovince');
+    
+        // Clear existing options
+        stateDropdown.innerHTML = '<option selected="" value="Default">(Please select a state/province)</option>';
+    
+        // Check the selected country and populate state/province options accordingly
+        if (countryDropdown.value === 'US') {
+            // Populate with US states
+            const usStates = [
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+                'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+                'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+                'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+                'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+                'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+                'West Virginia', 'Wisconsin', 'Wyoming'
+            ];
+            populateStates(usStates);
+        } else if (countryDropdown.value === 'CA') {
+            // Populate with Canadian provinces
+            const canadianProvinces = [
+                'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia',
+                'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'
+            ];
+            populateStates(canadianProvinces);
+        }
+    }
+    
+    function populateStates(states) {
+        const stateDropdown = document.getElementById('stateorprovince');
+    
+        states.forEach((state) => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateDropdown.appendChild(option);
+        });
+    }
+    
     document.addEventListener("DOMContentLoaded", function () {
       console.log('JavaScript code is executing');
+
+
+    // Initial population when the page loads
+    document.addEventListener('DOMContentLoaded', updateStateOptions);
+    
     
       document.getElementById('addressForm').addEventListener('submit', function (e) {
           e.preventDefault();
@@ -188,26 +186,40 @@
     
             if (data.validAddress === true && data.perfectMatch === true) {
               validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
-              validationResultElement.style.color = 'green';
+              validationResultElement.style.display = 'block'; 
+              validationResultElement.style.outline = '2px solid green';
               console.log('Address is valid and includes all optional elements.');
               console.log('Matching addresses:', fullAddress);
             }
             else if (data.validAddress == true && data.nearMatch == true) {
-              validationResultElement.textContent = "Near match found.";
-              validationResultElement.style.color = 'lightgreen';
-              console.log('Address is valid but is missing optional elements.');
-              console.log('Matching addresses:', fullAddress);
+                validationResultElement.innerHTML = `Near match found. Did you mean:<br>
+                addressLine1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
+                addressLine2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
+                city:${JSON.stringify(matchingAddresses.city)}<br>
+                country:${JSON.stringify(matchingAddresses.country)}<br>
+                state:${JSON.stringify(matchingAddresses.state)}<br>
+                zip:${JSON.stringify(matchingAddresses.zip)}<br>
+                zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
+                validationResultElement.style.display = 'block'; 
+                validationResultElement.style.outline = '2px solid lightgreen';
             }
             else if (data.validAddress === true && data.partialMatch === true) {
-              validationResultElement.textContent = `Partial match found. Did you mean addressLine1:${JSON.stringify(matchingAddresses.addressLine1)} addressLine2:${JSON.stringify(matchingAddresses.addressLine2)} city:${JSON.stringify(matchingAddresses.city)} country:${JSON.stringify(matchingAddresses.country)} state:${JSON.stringify(matchingAddresses.state)} zip:${JSON.stringify(matchingAddresses.zip)} zip +4:${JSON.stringify(matchingAddresses.zipplusfour)}  `;
-              validationResultElement.style.color = 'yellow';
-              validationResultElement.style.backgroundColor = 'black';
-              console.log('Address is valid but is partially incorrect.');
-              console.log('Matching addresses:', fullAddress);
+                validationResultElement.innerHTML = `Partial match found. Did you mean:<br>
+                addressLine1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
+                addressLine2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
+                city:${JSON.stringify(matchingAddresses.city)}<br>
+                country:${JSON.stringify(matchingAddresses.country)}<br>
+                state:${JSON.stringify(matchingAddresses.state)}<br>
+                zip:${JSON.stringify(matchingAddresses.zip)}<br>
+                zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
+                validationResultElement.style.display = 'block'; 
+                validationResultElement.style.outline = '2px solid yellow';
+             
             }
             else {
               validationResultElement.textContent = 'Matching address not found.';
-              validationResultElement.style.color = 'red';
+              validationResultElement.style.display = 'block'; 
+              validationResultElement.style.outline = '2px solid red';
               console.log('Address is not valid');
             }
           })
