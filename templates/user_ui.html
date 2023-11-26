@@ -65,22 +65,23 @@
     <li><label for="country">Country:</label></li>
     <li>
         <select name="country" id="country" required onchange="updateStateOptions()">
-            <option selected="" value="Default">(Please select a country)</option>
+            <option value="" disabled selected>(Please select a country)</option>
             <option value="US" id="US">USA</option>
             <option value="CA" id="CA">Canada</option>
         </select>
     </li>
-
+    
     <li><label for="stateorprovince">State/Province:</label></li>
     <li>
         <select name="stateorprovince" id="stateorprovince" required>
-            <option selected="" value="Default">(Please select a state/province)</option>
+            <option value="" disabled selected>(Please select a state/province)</option>
             <!-- Options will be dynamically populated based on the selected country -->
         </select>
     </li>
+    
 
     <li><label for="zip">ZIP Code:</label></li>
-    <li><input type="text" name="zip" id="zip" size="5" required/></li>
+    <li><input type="text" name="zip" id="zip" size="7" required/></li>
 
     <li><label for="zip +4">ZIP Code +4:</label></li>
     <li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
@@ -102,7 +103,7 @@
         if (countryDropdown.value === 'US') {
             // Populate with US states
             const usStates = [
-                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia',
                 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
                 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
                 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
@@ -197,7 +198,7 @@
                 addressLine2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
                 city:${JSON.stringify(matchingAddresses.city)}<br>
                 country:${JSON.stringify(matchingAddresses.country)}<br>
-                state:${JSON.stringify(matchingAddresses.state)}<br>
+                state:${JSON.stringify(matchingAddresses.stateorprovince)}<br>
                 zip:${JSON.stringify(matchingAddresses.zip)}<br>
                 zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
                 validationResultElement.style.display = 'block'; 
@@ -205,13 +206,13 @@
             }
             else if (data.validAddress === true && data.partialMatch === true) {
                 validationResultElement.innerHTML = `Partial match found. Did you mean:<br>
-                addressLine1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
-                addressLine2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
-                city:${JSON.stringify(matchingAddresses.city)}<br>
-                country:${JSON.stringify(matchingAddresses.country)}<br>
-                state:${JSON.stringify(matchingAddresses.state)}<br>
-                zip:${JSON.stringify(matchingAddresses.zip)}<br>
-                zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
+                Address Line 1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
+                Address Line 2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
+                City:${JSON.stringify(matchingAddresses.city)}<br>
+                Country:${JSON.stringify(matchingAddresses.country)}<br>
+                State:${JSON.stringify(matchingAddresses.state)}<br>
+                Zip:${JSON.stringify(matchingAddresses.zip)}<br>
+                Zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
                 validationResultElement.style.display = 'block'; 
                 validationResultElement.style.outline = '2px solid yellow';
              
@@ -229,5 +230,7 @@
       });
     });
     </script>
+    <div id="chart_div" style="width: 100%; height: 400px;"></div>
+
 </body>
 </html>
