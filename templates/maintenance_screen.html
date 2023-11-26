@@ -81,7 +81,16 @@
             margin-top: 20px;
         }
         </style>
-
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawChart);
+        
+            function drawChart() {
+                // Your chart drawing logic goes here
+            }
+        </script>
+        
 </head>
 <body>
     <h1>Address Verification - Maintenance Page</h1>
@@ -98,70 +107,22 @@
 <li><input type="text" name="city" id="city" size="20" required/></li>
 
 <li><label for="country">Country:</label></li>
-<li><select name="country" id="country" required>
-<option selected="" value="Default">(Please select a country)</option>
-<option value="US" id="US">USA</option>
-<option value="CA" id="CA">Canada</option>
-</select></li>
+<li>
+    <select name="country" id="country" required onchange="updateStateOptions()">
+        <option selected="" value="Default">(Please select a country)</option>
+        <option value="US" id="US">USA</option>
+        <option value="CA" id="CA">Canada</option>
+    </select>
+</li>
 
 <li><label for="stateorprovince">State/Province:</label></li>
 <li>
     <select name="stateorprovince" id="stateorprovince" required>
-        <option selected="" value="Default">(Please select a state)</option>
-        <option value="AL" id="AL">Alabama (AL)</option>
-        <option value="AK" id="AK">Alaska (AK)</option>
-        <option value="AZ" id="AZ">Arizona (AZ)</option>
-        <option value="AR" id="AR">Arkansas (AR)</option>
-        <option value="CA" id="CA">California (CA)</option>
-        <option value="CO" id="CO">Colorado (CO)</option>
-        <option value="CT" id="CT">Connecticut (CT)</option>
-        <option value="DE" id="DE">Delaware (DE)</option>
-        <option value="DC" id="DC">District Of Columbia (DC)</option>
-        <option value="FL" id="FL">Florida (FL)</option>
-        <option value="GA" id="GA">Georgia (GA)</option>
-        <option value="HI" id="HI">Hawaii (HI)</option>
-        <option value="ID" id="ID">Idaho (ID)</option>
-        <option value="IL" id="IL">Illinois (IL)</option>
-        <option value="IN" id="IN">Indiana (IN)</option>
-        <option value="IA" id="IA">Iowa (IA)</option>
-        <option value="KS" id="KS">Kansas (KS)</option>
-        <option value="KY" id="KY">Kentucky (KY)</option>
-        <option value="LA" id="LA">Louisiana (LA)</option>
-        <option value="ME" id="ME">Maine (ME)</option>
-        <option value="MD" id="MD">Maryland (MD)</option>
-        <option value="MA" id="MA">Massachusetts (MA)</option>
-        <option value="MI" id="MI">Michigan (MI)</option>
-        <option value="MN" id="MN">Minnesota (MN)</option>
-        <option value="MS" id="MS">Mississippi (MS)</option>
-        <option value="MO" id="MO">Missouri (MO)</option>
-        <option value="MT" id="MT">Montana (MT)</option>
-        <option value="NE" id="NE">Nebraska (NE)</option>
-        <option value="NV" id="NV">Nevada (NV)</option>
-        <option value="NH" id="NH">New Hampshire (NH)</option>
-        <option value="NJ" id="NJ">New Jersey (NJ)</option>
-        <option value="NM" id="NM">New Mexico (NM)</option>
-        <option value="NY" id="NY">New York (NY)</option>
-        <option value="NC" id="NC">North Carolina (NC)</option>
-        <option value="ND" id="ND">North Dakota (ND)</option>
-        <option value="OH" id="OH">Ohio (OH)</option>
-        <option value="OK" id="OK">Oklahoma (OK)</option>
-        <option value="OR" id="OR">Oregon (OR)</option>
-        <option value="PA" id="PA">Pennsylvania (PA)</option>
-        <option value="RI" id="RI">Rhode Island (RI)</option>
-        <option value="SC" id="SC">South Carolina (SC)</option>
-        <option value="SD" id="SD">South Dakota (SD)</option>
-        <option value="TN" id="TN">Tennessee (TN)</option>
-        <option value="TX" id="TX">Texas (TX)</option>
-        <option value="UT" id="UT">Utah (UT)</option>
-        <option value="VT" id="VT">Vermont (VT)</option>
-        <option value="VA" id="VA">Virginia (VA)</option>
-        <option value="WA" id="WA">Washington (WA)</option>
-        <option value="DC" id="DC">Washington DC (DC)</option>
-        <option value="WV" id="WV">West Virginia (WV)</option>
-        <option value="WI" id="WI">Wisconsin (WI)</option>
-        <option value="WY" id="WY">Wyoming (WY)</option>
+        <option selected="" value="Default">(Please select a state/province)</option>
+        <!-- Options will be dynamically populated based on the selected country -->
     </select>
 </li>
+
 
 <li><label for="zip">ZIP Code:</label></li>
 <li><input type="text" name="zip" id="zip" size="5" required/></li>
@@ -170,7 +131,18 @@
 <li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
 
 <li><input type="submit" value="Submit"></li>
+
 </form>
+
+<form>
+
+<label for="csvFile">Upload CSV File:</label>
+<input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+
+<!-- Your submit button -->
+<button type="submit">Submit CSV file:</button>
+</form>
+
 </div>
 
 
@@ -218,7 +190,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;">
+    <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;" onsubmit="return validateEditForm()">
     <input type="hidden" name="entry_id" id="edit-entry-id">
     <label for="edit-addressLine1">Address Line 1:</label>
     <input type="text" name="addressLine1" id="edit-addressLine1">
@@ -231,7 +203,131 @@
 
     <input type="submit" value="Save Changes">
     </form>
+    <div id="chart_div" style="width: 100%; height: 400px;"></div>
 <script>
+
+    
+    const regionMapping = {
+        'Connecticut': 'US Northeast',
+        'Delaware': 'US Northeast',
+        'Maine': 'US Northeast',
+        'Maryland': 'US Northeast',
+        'Massachusetts': 'US Northeast',
+        'New Hampshire': 'US Northeast',
+        'New Jersey': 'US Northeast',
+        'New York': 'US Northeast',
+        'Pennsylvania': 'US Northeast',
+        'Rhode Island': 'US Northeast',
+        'Vermont': 'US Northeast',
+        'District of Columbia': 'US Northeast',
+    
+        'Alabama': 'US South',
+        'Arkansas': 'US South',
+        'Florida': 'US South',
+        'Georgia': 'US South',
+        'Kentucky': 'US South',
+        'Louisiana': 'US South',
+        'Mississippi': 'US South',
+        'North Carolina': 'US South',
+        'South Carolina': 'US South',
+        'Tennessee': 'US South',
+        'Virginia': 'US South',
+        'West Virginia': 'US South',
+        'Texas': 'US South',
+        'Oklahoma': 'US South',
+    
+        'Illinois': 'US Midwest',
+        'Indiana': 'US Midwest',
+        'Iowa': 'US Midwest',
+        'Kansas': 'US Midwest',
+        'Michigan': 'US Midwest',
+        'Minnesota': 'US Midwest',
+        'Missouri': 'US Midwest',
+        'Nebraska': 'US Midwest',
+        'North Dakota': 'US Midwest',
+        'Ohio': 'US Midwest',
+        'South Dakota': 'US Midwest',
+        'Wisconsin': 'US Midwest',
+    
+        'Arizona': 'US West',
+        'California': 'US West',
+        'Colorado': 'US West',
+        'Idaho': 'US West',
+        'Montana': 'US West',
+        'Nevada': 'US West',
+        'New Mexico': 'US West',
+        'Oregon': 'US West',
+        'Utah': 'US West',
+        'Washington': 'US West',
+        'Wyoming': 'US West',
+        'Alaska': 'US West',
+        'Hawaii': 'US West',
+    
+        'New Brunswick': 'East Canada',
+        'Newfoundland and Labrador': 'East Canada',
+        'Nova Scotia': 'East Canada',
+        'Ontario': 'East Canada',
+        'Prince Edward Island': 'East Canada',
+        'Quebec': 'East Canada',
+    
+        'Alberta': 'West Canada',
+        'British Columbia': 'West Canada',
+        'Manitoba': 'West Canada',
+        'Saskatchewan': 'West Canada'
+    };
+    
+    const regionCounts = {
+        'US Northeast': 0,
+        'US South': 0,
+        'US Midwest': 0,
+        'US West': 0,
+        'East Canada': 0,
+        'West Canada': 0
+    };
+
+    function updateStateOptions() {
+        const countryDropdown = document.getElementById('country');
+        const stateDropdown = document.getElementById('stateorprovince');
+    
+        // Clear existing options
+        stateDropdown.innerHTML = '<option selected="" value="Default">(Please select a state/province)</option>';
+    
+        // Check the selected country and populate state/province options accordingly
+        if (countryDropdown.value === 'US') {
+            // Populate with US states
+            const usStates = [
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia',
+                'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+                'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+                'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+                'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+                'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+                'West Virginia', 'Wisconsin', 'Wyoming'
+            ];
+            populateStates(usStates);
+        } else if (countryDropdown.value === 'CA') {
+            // Populate with Canadian provinces
+            const canadianProvinces = [
+                'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia',
+                'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'
+            ];
+            populateStates(canadianProvinces);
+        }
+    }
+    
+    function populateStates(states) {
+        const stateDropdown = document.getElementById('stateorprovince');
+    
+        states.forEach((state) => {
+            const option = document.createElement('option');
+            option.value = state;
+            option.textContent = state;
+            stateDropdown.appendChild(option);
+        });
+    }
+
+
+
     document.addEventListener('DOMContentLoaded', () => {
         fetchEntries(); // Fetch entries when the page loads
         addOpenPopupClickListener(); // Add click event listener to open popup button
@@ -239,6 +335,32 @@
         searchInput.addEventListener('input', fetchEntries);
         searchInput.addEventListener('change', fetchEntries);
     });
+
+
+    // Event listener for CSV upload form
+document.getElementById('csvFile').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Create a FormData object to append form data
+    const formData = new FormData(this);
+
+    // Make a POST request to your server endpoint (modify the URL accordingly)
+    fetch('/upload_csv', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the server response for CSV upload
+        console.log(data);
+        // Optionally, update the UI based on the response
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle errors if needed
+    });
+});
+    
 
     function fetchEntries() {
         console.log('Fetching entries...');
@@ -257,7 +379,10 @@
                 const tbody = document.querySelector('tbody');
                 const searchInput = document.getElementById('searchInput').value.toLowerCase();
                 tbody.innerHTML = '';
-    
+
+                for (const region in regionCounts) {
+                    regionCounts[region] = 0;
+                }
                 entries.forEach((entry) => {
                     // Check if addressLine1 is defined before accessing its value
                     if (entry.addressLine1 && entry.addressLine1.toLowerCase().includes(searchInput) ||
@@ -271,12 +396,17 @@
                         // Only add the row if it matches the search input
                         const row = createRow(entry);
                         tbody.appendChild(row);
+
+                        const region = regionMapping[entry.stateorprovince] || regionMapping[entry.country];
+                        if (region) {
+                            regionCounts[region]++;
                     }
+                }
                 });
-    
+                drawChart();
                 addEditButtonsClickListener();
                 addDeleteButtonsClickListener();
-            })
+                   })
             .catch((error) => {
                 console.error('Error fetching entries:', error);
             });
@@ -526,9 +656,51 @@ function populateEditForm(entry) {
     console.log('Edit form populated:', entry);
 }
 
+function validateEditForm() {
+    // Validate required fields
+    console.log('Validating form...');
+    const requiredFields = ['edit-addressLine1', 'edit-city', 'edit-country', 'edit-stateorprovince', 'edit-zip'];
+    for (const field of requiredFields) {
+        const value = document.getElementById(field).value.trim();
+        if (!value) {
+            alert(`Please fill in the required field: ${field}`);
+            return false; // Prevent form submission
+        }
+    }
+
+    return true; // Allow form submission
+}
+
 </script>
 
+<script>
+google.charts.load('current', { 'packages': ['corechart'] });
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+    // Convert region counts object to an array
+    const regionData = Object.entries(regionCounts);
+
+    // Add chart drawing logic
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Region');
+    data.addColumn('number', 'Number of Addresses');
+    
+    // Add data to the chart
+    data.addRows(regionData);
+
+    var options = {
+        title: 'Number of Addresses in Each Region',
+        pieHole: 0.4, // Add a hole in the middle for a donut chart effect
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+}
+</script>
+<div id="chart_div" style="width: 100%; height: 400px;"></div>
 
 </body>
 
 </html>
+
