@@ -99,10 +99,10 @@
             margin: 0 10px;
         }
 
-        .pagination ul {
-            list-style-type: none; /* Removes the bullet points */
-            padding: 0; /* Removes default padding */
-            margin: 0; /* Removes default margin */
+        .pagination  {
+            list-style-type: none; /* Removes the blet points */
+            padding: 0; /* Removes defat padding */
+            margin: 0; /* Removes defat margin */
         }
 
         .pagination li {
@@ -222,30 +222,6 @@
         </tbody>
     </table>
     <!-- Maintenance Screen Content -->
-
-<!-- Pagination Links -->
-<nav aria-label="Page navigation">
-  <ul class="pagination">
-    {% if page > 1 %}
-      <li class="page-item"><a class="page-link" href="{{ url_for('database_management', page=page-1) }}">Previous</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Previous</span></li>
-    {% endif %}
-
-    {% for p in range(1, total_pages + 1) %}
-      <li class="page-item {{ 'active' if p == page else '' }}"><a class="page-link" href="{{ url_for('database_management', page=p) }}">{{ p }}</a></li>
-    {% endfor %}
-
-    {% if page < total_pages %}
-      <li class="page-item"><a class="page-link" href="{{ url_for('database_management', page=page+1) }}">Next</a></li>
-    {% else %}
-      <li class="page-item disabled"><span class="page-link">Next</span></li>
-    {% endif %}
-  </ul>
-</nav>
-
-
-
 
     <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;" onsubmit="return validateEditForm()">
     <input type="hidden" name="entry_id" id="edit-entry-id">
