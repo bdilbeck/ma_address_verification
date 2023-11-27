@@ -99,6 +99,18 @@
             margin: 0 10px;
         }
 
+        .pagination ul {
+            list-style-type: none; /* Removes the bullet points */
+            padding: 0; /* Removes default padding */
+            margin: 0; /* Removes default margin */
+        }
+
+        .pagination li {
+            display: inline; /* Displays the list items inline */
+            margin-right: 10px; /* Adds some space between the items */
+        }
+
+
         </style>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
@@ -213,7 +225,7 @@
 
 <!-- Pagination Links -->
 <nav aria-label="Page navigation">
-  <p class="pagination">
+  <ul class="pagination">
     {% if page > 1 %}
       <li class="page-item"><a class="page-link" href="{{ url_for('database_management', page=page-1) }}">Previous</a></li>
     {% else %}
@@ -229,7 +241,7 @@
     {% else %}
       <li class="page-item disabled"><span class="page-link">Next</span></li>
     {% endif %}
-  </p>
+  </ul>
 </nav>
 
 
