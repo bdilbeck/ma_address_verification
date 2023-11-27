@@ -190,6 +190,18 @@
             {% endfor %}
         </tbody>
     </table>
+    <!-- Maintenance Screen Content -->
+
+<div class="pagination">
+    {% if page > 1 %}
+        <a href="{{ url_for('entry_list', page=page-1) }}">&laquo; Previous</a>
+    {% endif %}
+    <span>Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+        <a href="{{ url_for('entry_list', page=page+1) }}">Next &raquo;</a>
+    {% endif %}
+</div>
+
     <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;" onsubmit="return validateEditForm()">
     <input type="hidden" name="entry_id" id="edit-entry-id">
     <label for="edit-addressLine1">Address Line 1:</label>
