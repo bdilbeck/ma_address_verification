@@ -9,7 +9,7 @@
             text-align: center;
             padding: 50px;
         }
-        
+
         h1, h4 {
             color: #070606;
             margin-bottom: 20px;
@@ -48,6 +48,10 @@
             box-sizing: border-box;
         }
         
+        .tableFixHead  { overflow: auto; height: 300px; }
+
+        .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+
         
         form li {
             list-style-type: none;
@@ -63,6 +67,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+
         }
         
         table, th, td {
@@ -75,42 +80,13 @@
             background-color: #f0f0f0;
         }
         
-       
         #edit-form {
             display: none; 
             margin-top: 20px;
         }
 
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .pagination a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: #007bff;
-        }
-
-        .pagination span {
-            margin: 0 10px;
-        }
-
-        .pagination  {
-            list-style-type: none; /* Removes the blet points */
-            padding: 0; /* Removes defat padding */
-            margin: 0; /* Removes defat margin */
-        }
-
-        .pagination li {
-            display: inline; /* Displays the list items inline */
-            margin-right: 10px; /* Adds some space between the items */
-        }
-
-
+        
         </style>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
@@ -118,7 +94,6 @@
             google.charts.setOnLoadCallback(drawChart);
         
             function drawChart() {
-                // Your chart drawing logic goes here
             }
         </script>
         
@@ -128,7 +103,7 @@
     <h4>Use this page to add, edit, and delete records in the database.</h4>
 
 
-<button id="openPopup">Add New Address</button>
+<button id="openPopup">Add New Address</button> <!-- Opens a popup that allows users to enter a new address into the database -->
 <div id="popup" style="display: none;">
 <form id="popupForm" action="/new_entry" method="post"><li><label for="AddressLine1">Address Line 1:</label></li>
 <li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
@@ -165,21 +140,14 @@
 
 </form>
 
-<form>
-
-<label for="csvFile">Upload CSV File:</label>
-<input type="file" id="csvFile" name="csvFile" accept=".csv" required>
-
-<!-- Your submit button -->
-<button type="submit">Submit CSV file:</button>
-</form>
 
 </div>
 
 
     <h1>Entry Lookup</h1>
-    <input type="text" id="searchInput" placeholder="Search addresses">
-    <table>
+    <input type="text" id="searchInput" placeholder="Search addresses"> <!-- Search bar allows users to find list of addresses that meet their entered criteria -->
+    <div class="tableFixHead">
+    <table>                                          <!-- Table that lists all of the addresses. The edit and delete buttons allow the user to alter or remove addresses from the DB -->
         <thead>
             <tr>
                 <th colspan="10">Addresses</th>
@@ -193,8 +161,7 @@
                         <th>Country</th>
                         <th>ZIP Code</th>
                         <th>ZIP Code +4</th>
-                        <th>Action</th>
-                        <th>Action</th>
+                        <th colspan="2" style="text-align: center;">Action </th>
             </tr>
         </thead>
         <tbody>
@@ -211,36 +178,41 @@
             
              
                 <td>
-              <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button> 
+              <button class="edit-entry-button" data-entry-id="{{ entry._id }}">Edit</button> <!--Edit Button-->
                 </td> 
                 <td>
-                    <button class="delete-entry-button" data-entry-id="{{ entry._id }}">Delete</button>
+                    <button class="delete-entry-button" data-entry-id="{{ entry._id }}">Delete</button>  <!--Delete Button-->
                 </td>
                 
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <!-- Maintenance Screen Content -->
-
+    </div>
     <form id="edit-form" action="/edit_entry/{{ entry_id }}" method="post" style="display: none;" onsubmit="return validateEditForm()">
     <input type="hidden" name="entry_id" id="edit-entry-id">
     <label for="edit-addressLine1">Address Line 1:</label>
-    <input type="text" name="addressLine1" id="edit-addressLine1">
+    <input type="text" name="addressLine1" id="edit-addressLine1"> <!-- Entry form accessed by users after pressing the edit button -->
+    <label for="edit-addressLine1">Address Line 2:</label>
     <input type="text" name="addressLine2" id="edit-addressLine2">
+    <label for="edit-addressLine1">City:</label>
     <input type="text" name="city" id="edit-city">
+    <label for="edit-addressLine1">State/Province:</label>
     <input type="text" name="stateorprovince" id="edit-stateorprovince">
+    <label for="edit-addressLine1">Country:</label>
     <input type="text" name="country" id="edit-country">
+    <label for="edit-addressLine1">Zip:</label>
     <input type="text" name="zip" id="edit-zip">
+    <label for="edit-addressLine1">Zip +4:</label>
     <input type="text" name="zipplusfour" id="edit-zipplusfour">
 
-    <input type="submit" value="Save Changes">
+    <input type="submit" value="Save Changes"> <!-- Submit form -->
     </form>
     <div id="chart_div" style="width: 100%; height: 400px;"></div>
 <script>
 
     
-    const regionMapping = {
+    const regionMapping = {  // List that assigns each state/province to its region
         'Connecticut': 'US Northeast',
         'Delaware': 'US Northeast',
         'Maine': 'US Northeast',
@@ -309,7 +281,7 @@
         'Saskatchewan': 'West Canada'
     };
     
-    const regionCounts = {
+    const regionCounts = { //counts the number of addresses in each region
         'US Northeast': 0,
         'US South': 0,
         'US Midwest': 0,
@@ -318,16 +290,16 @@
         'West Canada': 0
     };
 
-    function updateStateOptions() {
+    function updateStateOptions() {        // Checks the selected country and populates its state/province options accordingly
+
         const countryDropdown = document.getElementById('country');
         const stateDropdown = document.getElementById('stateorprovince');
     
-        // Clear existing options
+        // Clears existing options
         stateDropdown.innerHTML = '<option selected="" value="Default">(Please select a state/province)</option>';
     
-        // Check the selected country and populate state/province options accordingly
         if (countryDropdown.value === 'US') {
-            // Populate with US states
+            // Populates with US states
             const usStates = [
                 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia',
                 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
@@ -370,38 +342,14 @@
     });
 
 
-    // Event listener for CSV upload form
-document.getElementById('csvFile').addEventListener('submit', function (event) {
-    event.preventDefault();
 
-    // Create a FormData object to append form data
-    const formData = new FormData(this);
-
-    // Make a POST request to your server endpoint (modify the URL accordingly)
-    fetch('/upload_csv', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle the server response for CSV upload
-        console.log(data);
-        // Optionally, update the UI based on the response
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        // Handle errors if needed
-    });
-});
-    
-
-    function fetchEntries() {
+    function fetchEntries() { // Gets data to populate table
         console.log('Fetching entries...');
     
-        fetch('/entries-json')
+        fetch('/entries-json') //Requests data from /entries-json server endpoint
             .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`Fetch failed with status: ${response.status}`);
+                    throw new Error(`Fetch failed with status: ${response.status}`); // handles fetch failure
                 }
                 return response.json();
             })
@@ -410,14 +358,14 @@ document.getElementById('csvFile').addEventListener('submit', function (event) {
     
                 const entries = data.entries;
                 const tbody = document.querySelector('tbody');
-                const searchInput = document.getElementById('searchInput').value.toLowerCase();
+                const searchInput = document.getElementById('searchInput').value.toLowerCase(); // Makes page's search function non-case-sensitive
                 tbody.innerHTML = '';
 
                 for (const region in regionCounts) {
                     regionCounts[region] = 0;
                 }
                 entries.forEach((entry) => {
-                    // Check if addressLine1 is defined before accessing its value
+                    // Checks if any of the fields contain the same content that is being searched for
                     if (entry.addressLine1 && entry.addressLine1.toLowerCase().includes(searchInput) ||
                         (entry.addressLine2 && entry.addressLine2.toLowerCase().includes(searchInput)) ||
                         (entry.city && entry.city.toLowerCase().includes(searchInput)) ||
@@ -426,7 +374,7 @@ document.getElementById('csvFile').addEventListener('submit', function (event) {
                         (entry.zip && entry.zip.toLowerCase().includes(searchInput)) ||
                         (entry.zipplusfour && entry.zipplusfour.toLowerCase().includes(searchInput))
                     ) {
-                        // Only add the row if it matches the search input
+                        // Only adds the row if it matches the search input entered by the user
                         const row = createRow(entry);
                         tbody.appendChild(row);
 
@@ -436,21 +384,19 @@ document.getElementById('csvFile').addEventListener('submit', function (event) {
                     }
                 }
                 });
-                drawChart();
-                addEditButtonsClickListener();
+                drawChart(); // Creates chart based on data from table
+                addEditButtonsClickListener(); //Click listeners that react to edit and delete buttons being pressed
                 addDeleteButtonsClickListener();
                    })
             .catch((error) => {
-                console.error('Error fetching entries:', error);
+                console.error('Error fetching entries:', error);// Error handling
             });
     }
-    
 
     
-// Create a separate function to generate a row for an entry
+// Generates a row for each entry
 function createRow(entry) {
     const row = document.createElement('tr');
-    // ... (same code as before for creating cells)
     const idCell = document.createElement('td');
 
     idCell.textContent = entry._id;
@@ -490,15 +436,15 @@ function createRow(entry) {
     deleteButton.textContent = 'Delete';
     deleteButton.dataset.entryId = entry._id;
 
-    // Attach an event listener to the "Edit" button
+    // Attaches an event listener to the Edit buttons
     editButton.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent the link from navigating
+        event.preventDefault(); // Prevents the link from navigating
 
         const entryId = entry._id;
         getEntryById(entryId)
             .then((entry) => {
                 if (entry) {
-                    // Populate the edit form with the entry data and show it
+                    // Populates the edit form with the entry data 
                     populateEditForm(entry);
                 }
             })
@@ -507,7 +453,7 @@ function createRow(entry) {
             });
     });
 
-    row.appendChild(idCell);
+    row.appendChild(idCell);        //appends each cell in the row
     row.appendChild(addressLine1Cell);
     row.appendChild(addressLine2Cell);
     row.appendChild(cityCell);
@@ -532,10 +478,9 @@ function createRow(entry) {
     
 
 
-    function addDeleteButtonsClickListener() {
+    function addDeleteButtonsClickListener() { //reacts to delete button being pressed
         console.log('Delete Buttons Click Listener');
     
-        // Attach a click event listener to the 'tbody' element
         const table = document.querySelector('table');
         table.addEventListener('click', async (event) => { 
             const deleteButton = event.target.closest('.delete-entry-button');
@@ -548,7 +493,7 @@ function createRow(entry) {
     
                 if (confirmed) {
                     await deleteEntry(entryId);
-                    fetchEntries(); // Refresh the entry list
+                    fetchEntries(); // Refreshes the entry list
                 }
             }
         });
@@ -562,10 +507,9 @@ function deleteEntry(entryId) {
     })
     .then((response) => {
         if (response.ok) {
-            // Handle the success case, e.g., by updating the UI
-            fetchEntries(); // Refresh the entry list
+            fetchEntries(); // Refreshes the entry list
         } else {
-            // Handle errors, e.g., by displaying an error message
+            // Handles by displaying an error message
             console.error('Entry deletion failed with status:', response.status);
         }
     })
@@ -579,7 +523,7 @@ function deleteEntry(entryId) {
 function addEditButtonsClickListener() {
     console.log('Add Edit Buttons Click Listener');
 
-    // Add a click event listener to all elements with the class "edit-entry-button"
+    // Add a click event listener for edit buttons
     const tbody = document.querySelector('tbody');
 
     tbody.addEventListener('click', (event) => {
@@ -592,7 +536,7 @@ function addEditButtonsClickListener() {
                 const entry = getEntryById(entryId)
                     .then((entry) => {
                         if (entry) {
-                            // Populate the edit form with the entry data and show it
+                            // Populate the edit form with the entry data 
                             populateEditForm(entry);
                         }
                     })
@@ -607,17 +551,17 @@ function addEditButtonsClickListener() {
 }
 
 
-function addOpenPopupClickListener() {
+function addOpenPopupClickListener() {// instructions for when to show/hide popup form
     const openButton = document.getElementById('openPopup');
     const popup = document.getElementById('popup');
 
     openButton.addEventListener('click', () => {
-        popup.style.display = 'block'; // Show the pop-up
+        popup.style.display = 'block'; // Shows the pop-up
     });
 
     const popupForm = document.getElementById('popupForm');
     popupForm.addEventListener('submit', () => {
-        popup.style.display = 'none'; // Hide the pop-up after submission
+        popup.style.display = 'none'; // Hides the pop-up after submission
     });
 }
 
@@ -651,10 +595,10 @@ editForm.addEventListener('submit', async (event) => {
         });
 
         if (response.ok) {
-            // Handle the success case
+            // Confirms successful form submission
             console.log('Form submitted successfully');
         } else {
-            // Handle errors, such as displaying an error message
+            // Handle errors with form submission
             console.error('Form submission failed with status:', response.status);
         }
     } catch (error) {
@@ -667,11 +611,8 @@ editForm.addEventListener('submit', async (event) => {
 
 function populateEditForm(entry) {
     console.log('Populating edit form:', entry);
-    // Implement a function to populate the edit form with entry data
-    // Set the input fields with the entry's values for editing
-    // Show the edit form
+    // Populates the edit form with entered data
 
-    // Example code to populate form fields (adjust based on your HTML structure)
     document.getElementById('edit-entry-id').value = entry._id;
     document.getElementById('edit-addressLine1').value = entry.addressLine1;
     document.getElementById('edit-addressLine2').value = entry.addressLine2;
@@ -689,10 +630,33 @@ function populateEditForm(entry) {
     console.log('Edit form populated:', entry);
 }
 
+function populateEditForm(entry) {
+    console.log('Populating edit form:', entry);
+
+    document.getElementById('edit-entry-id').value = entry._id;
+    document.getElementById('edit-addressLine1').value = entry.addressLine1 || ''; // Sets field to empty string if undefined
+    document.getElementById('edit-addressLine2').value = entry.addressLine2 || ''; 
+    document.getElementById('edit-city').value = entry.city || ''; 
+    document.getElementById('edit-stateorprovince').value = entry.stateorprovince || ''; 
+    document.getElementById('edit-country').value = entry.country || ''; 
+    document.getElementById('edit-zip').value = entry.zip || '';  
+    document.getElementById('edit-zipplusfour').value = entry.zipplusfour || ''; 
+
+    const editForm = document.getElementById('edit-form');
+    editForm.action = `/edit_entry/${entry._id}`;
+
+    document.getElementById('edit-form').style.display = 'block'; // Show the edit form
+    console.log('Edit form populated:', entry);
+}
+
+
+
 function validateEditForm() {
-    // Validate required fields
+    // Validation for editing state/country fields
     console.log('Validating form...');
+
     const requiredFields = ['edit-addressLine1', 'edit-city', 'edit-country', 'edit-stateorprovince', 'edit-zip'];
+    
     for (const field of requiredFields) {
         const value = document.getElementById(field).value.trim();
         if (!value) {
@@ -701,20 +665,53 @@ function validateEditForm() {
         }
     }
 
+    const validCountries = ['US', 'CA'];  // Valid countries for edit entries
+    const validStatesByCountry = {//Valid states/provinces for US/Canada respectively
+        'US': [
+            'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Florida',
+            'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine',
+            'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska',
+            'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+            'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas',
+            'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+        ],
+        'CA': [
+            'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia',
+            'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'
+        ]
+    };
+
+    // Validate country
+    const countryValue = document.getElementById('edit-country').value;
+    console.log('Selected country:', countryValue);
+    if (!validCountries.includes(countryValue)) {
+        alert('Please enter a valid country.');
+        return false;
+    }
+
+    // Validate state or province based on the selected country
+    const stateOrProvinceValue = document.getElementById('edit-stateorprovince').value;
+    console.log('Selected state or province:', stateOrProvinceValue);
+    const selectedCountry = countryValue;
+    const validStates = validStatesByCountry[selectedCountry] || [];
+    if (!validStates.includes(stateOrProvinceValue)) {
+        alert('Please enter a valid state or province.');
+        return false;
+    }
+
     return true; // Allow form submission
 }
 
 </script>
 
 <script>
-google.charts.load('current', { 'packages': ['corechart'] });
+google.charts.load('current', { 'packages': ['corechart'] }); // chart created with googlecharts.js, 
 google.charts.setOnLoadCallback(drawChart);
 
 function drawChart() {
-    // Convert region counts object to an array
+    // Converts the region counts object to an array
     const regionData = Object.entries(regionCounts);
 
-    // Add chart drawing logic
     var data = new google.visualization.DataTable();
     data.addColumn('string', 'Region');
     data.addColumn('number', 'Number of Addresses');
@@ -723,8 +720,8 @@ function drawChart() {
     data.addRows(regionData);
 
     var options = {
-        title: 'Number of Addresses in Each Region',
-        pieHole: 0.4, // Add a hole in the middle for a donut chart effect
+        title: 'Addresses in Each Region',
+        pieHole: 0.4, // Adds a hole in the middle to turn chart into donut chart
     };
 
     var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
