@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
 <head>
     <title>Address Lookup</title>
-    <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script> <!--  -->
     <style>    
             body {
                 font-family: 'Helvetica Now Display', sans-serif;
@@ -53,7 +53,7 @@
     </style>
 </head>
 <body>
-<h1>Address Verification</h1>
+<h1>Address Verification</h1> <!-- This is the form for entering addresses -->
 <form id="addressForm">
     <li><label for="addressLine1">Address Line 1:</label></li>
     <li><input type="text" name="addressLine1" id="addressLine1" size="60" required/></li>
@@ -75,13 +75,13 @@
     <li>
         <select name="stateorprovince" id="stateorprovince" required>
             <option value="" disabled selected>(Please select a state/province)</option>
-            <!-- Options will be dynamically populated based on the selected country -->
+            <!--Options will change depending on which country is selected -->
         </select>
     </li>
     
 
     <li><label for="zip">ZIP Code:</label></li>
-    <li><input type="text" name="zip" id="zip" size="7" required/></li>
+    <li><input type="text" name="zip" id="zip" size="7" required/></li> <!-- Zip code set to 7 to account for different Canadian system -->
 
     <li><label for="zip +4">ZIP Code +4:</label></li>
     <li><input type="text" name="zip +4" size="4" id="zipplusfour"/></li>
@@ -92,16 +92,16 @@
 <div id="validationResult"></div>
 
 <script>
-    function updateStateOptions() {
+    function updateStateOptions() { // The logic of this function instructs the site to toggle between states/provinces based on which country is chosen
         const countryDropdown = document.getElementById('country');
         const stateDropdown = document.getElementById('stateorprovince');
     
-        // Clear existing options
+        // Default option shown when new page loaded
         stateDropdown.innerHTML = '<option selected="" value="Default">(Please select a state/province)</option>';
     
         // Check the selected country and populate state/province options accordingly
         if (countryDropdown.value === 'US') {
-            // Populate with US states
+            // Used to populate list with US states
             const usStates = [
                 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia',
                 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
@@ -113,7 +113,7 @@
             ];
             populateStates(usStates);
         } else if (countryDropdown.value === 'CA') {
-            // Populate with Canadian provinces
+            //Used to populate list with Canadian provinces
             const canadianProvinces = [
                 'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Nova Scotia',
                 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan'
@@ -122,30 +122,30 @@
         }
     }
     
-    function populateStates(states) {
+    function populateStates(states) { //Populates the dropdown list based on which country was chosen
         const stateDropdown = document.getElementById('stateorprovince');
     
         states.forEach((state) => {
             const option = document.createElement('option');
             option.value = state;
-            option.textContent = state;
+            option.textContent = state; // sets each value to the respective state/province name
             stateDropdown.appendChild(option);
         });
     }
     
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () { //executes as page loads
       console.log('JavaScript code is executing');
 
 
-    // Initial population when the page loads
+    // The initial population of the dropdown list when the page loads
     document.addEventListener('DOMContentLoaded', updateStateOptions);
     
     
-      document.getElementById('addressForm').addEventListener('submit', function (e) {
-          e.preventDefault();
+      document.getElementById('addressForm').addEventListener('submit', function (e) { //Reacts when user presses "Submit" button
+          e.preventDefault(); // Prevents page from reloading
           console.log('Submit button event listener is called.');
     
-          const addressLine1 = document.getElementById('addressLine1').value;
+          const addressLine1 = document.getElementById('addressLine1').value; // salvages the data that the user entered into the verification form
           const addressLine2 = document.getElementById('addressLine2').value;
           const city = document.getElementById('city').value;
           const stateorprovince = document.getElementById('stateorprovince').value;
@@ -153,64 +153,52 @@
           const zip = document.getElementById('zip').value;
           const zipplusfour = document.getElementById('zipplusfour').value;
     
-          const fullAddress ={
+          const fullAddress ={ // Converts entered data to JSON
             addressLine1: addressLine1,
             ...(addressLine2 && { addressLine2: addressLine2 }),
             city: city,
             stateorprovince: stateorprovince,
             country: country,
             zip: zip,
-            ...(zipplusfour && { zipplusfour: zipplusfour })
+            ...(zipplusfour && { zipplusfour: zipplusfour }) //optional fields
           };
     
-          fetch('/submitAddress', {
+          fetch('/submitAddress', { //Sends a POST request to /submitAddress endpoint on app.py page
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
               },
               body: JSON.stringify(fullAddress),
           })
-          .then(response => response.json())
+          .then(response => response.json()) //Handles server response
           .then(data => {
             console.log('Server Response:', data);
     
-            // Add logs to check the values
+            //  logs to check the various values
             console.log('validAddress:', data.validAddress);
             console.log('perfectMatch:', data.perfectMatch);
-            console.log('nearMatch:', data.nearMatch);
             console.log('partialMatch:', data.partialMatch);
             console.log('found_match:', data.found_match);
     
             const validationResultElement = document.getElementById('validationResult');
     
-            matchingAddresses = data.found_match
+            matchingAddresses = data.found_match //defines a match found in the database
     
-            if (data.validAddress === true && data.perfectMatch === true) {
+            if (data.validAddress === true && data.perfectMatch === true) { // Defines criteria for a perfect match and returns corresponding message.
               validationResultElement.textContent = 'Matching address found. (Perfect Match!)';
               validationResultElement.style.display = 'block'; 
               validationResultElement.style.outline = '2px solid green';
               console.log('Address is valid and includes all optional elements.');
               console.log('Matching addresses:', fullAddress);
             }
-            else if (data.validAddress == true && data.nearMatch == true) {
-                validationResultElement.innerHTML = `Near match found. Did you mean:<br>
-                addressLine1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
-                addressLine2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
-                city:${JSON.stringify(matchingAddresses.city)}<br>
-                country:${JSON.stringify(matchingAddresses.country)}<br>
-                state:${JSON.stringify(matchingAddresses.stateorprovince)}<br>
-                zip:${JSON.stringify(matchingAddresses.zip)}<br>
-                zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
-                validationResultElement.style.display = 'block'; 
-                validationResultElement.style.outline = '2px solid lightgreen';
-            }
-            else if (data.validAddress === true && data.partialMatch === true) {
+
+            else if (data.validAddress === true && data.partialMatch === true) { // Defines criteria for a partial match and returns corresponding message.
                 validationResultElement.innerHTML = `Partial match found. Did you mean:<br>
                 Address Line 1:${JSON.stringify(matchingAddresses.addressLine1)}<br>
                 Address Line 2:${JSON.stringify(matchingAddresses.addressLine2)}<br>
                 City:${JSON.stringify(matchingAddresses.city)}<br>
                 Country:${JSON.stringify(matchingAddresses.country)}<br>
-                State:${JSON.stringify(matchingAddresses.state)}<br>
+                State:${JSON.stringify(matchingAddresses.stateorprovince)}<br>
                 Zip:${JSON.stringify(matchingAddresses.zip)}<br>
                 Zip +4:${JSON.stringify(matchingAddresses.zipplusfour)} `;
                 validationResultElement.style.display = 'block'; 
@@ -218,19 +206,18 @@
              
             }
             else {
-              validationResultElement.textContent = 'Matching address not found.';
+              validationResultElement.textContent = 'Matching address not found.'; // No match was found in the database. The corresponding message is shown.
               validationResultElement.style.display = 'block'; 
               validationResultElement.style.outline = '2px solid red';
               console.log('Address is not valid');
             }
           })
           .catch(error => {
-              console.error('Error:', error);
+              console.error('Error:', error); //Handles errors if/when they occur
           });
       });
     });
     </script>
-    <div id="chart_div" style="width: 100%; height: 400px;"></div>
 
 </body>
 </html>
